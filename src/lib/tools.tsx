@@ -1,4 +1,4 @@
-import { ImageIcon, File, FileText, Search } from 'lucide-react';
+import { ImageIcon, File, FileText, Search, Scissors, UserSquare } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -25,8 +25,9 @@ export const toolCategories: ToolCategory[] = [
       { name: 'WebP to JPG', href: '/webp-to-jpg', description: 'Convert WebP to JPG format.' },
       { name: 'JPG to AVIF', href: '/jpg-to-avif', description: 'Convert JPG images to the next-gen AVIF format.' },
       { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert PNG images to the next-gen AVIF format.' },
+      { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your desired dimensions.' },
+      { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create standards-compliant passport photos.' },
       { name: 'GIF to MP4', href: '#', description: 'Convert animated GIF to MP4 video.' },
-      { name: 'Image Resizer', href: '#', description: 'Resize images to your desired dimensions.' },
     ],
   },
   {
