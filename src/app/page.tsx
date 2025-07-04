@@ -1,51 +1,8 @@
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search as SearchIcon, ImageIcon, File, FileText, ArrowRight } from 'lucide-react';
-
-const toolCategories = [
-  {
-    name: 'Image Tools',
-    icon: <ImageIcon className="h-8 w-8 text-primary" />,
-    tools: [
-      { name: 'JPG to PNG', href: '/jpg-to-png' },
-      { name: 'PNG to JPG', href: '/png-to-jpg' },
-      { name: 'WebP to JPG', href: '#' },
-      { name: 'GIF to MP4', href: '#' },
-      { name: 'Image Resizer', href: '#' },
-    ],
-  },
-  {
-    name: 'File Converters',
-    icon: <File className="h-8 w-8 text-primary" />,
-    tools: [
-      { name: 'MP4 to AVI', href: '/mp4-to-avi' },
-      { name: 'MP3 to WAV', href: '/mp3-to-wav' },
-      { name: 'DOC to PDF', href: '/doc-to-pdf' },
-      { name: 'EPUB to MOBI', href: '#' },
-    ],
-  },
-  {
-    name: 'PDF Tools',
-    icon: <FileText className="h-8 w-8 text-primary" />,
-    tools: [
-      { name: 'PDF to Word', href: '#' },
-      { name: 'Word to PDF', href: '#' },
-      { name: 'PDF Merge', href: '#' },
-      { name: 'PDF Split', href: '#' },
-    ],
-  },
-  {
-    name: 'SEO Tools',
-    icon: <SearchIcon className="h-8 w-8 text-primary" />,
-    tools: [
-      { name: 'Meta Tag Generator', href: '/seo/meta-tag-generator' },
-      { name: 'Keyword Research', href: '#' },
-      { name: 'Plagiarism Checker', href: '#' },
-      { name: 'Backlink Checker', href: '#' },
-    ],
-  },
-];
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Search, ArrowRight } from 'lucide-react';
+import { toolCategories } from '@/lib/tools';
 
 export default function Home() {
   return (
@@ -59,7 +16,7 @@ export default function Home() {
         </p>
         <div className="max-w-xl mx-auto">
           <div className="relative">
-            <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search for a tool (e.g., 'PNG to JPG')"
@@ -70,15 +27,16 @@ export default function Home() {
       </section>
 
       <section className="mt-16 md:mt-24">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 md:grid-cols-2">
           {toolCategories.map((category) => (
             <Card key={category.name} className="flex flex-col hover:shadow-xl transition-shadow duration-300 rounded-xl">
-              <CardHeader className="flex flex-row items-center gap-4">
+              <CardHeader className="flex flex-row items-center gap-4 pb-2">
                 {category.icon}
-                <CardTitle className="font-headline">{category.name}</CardTitle>
+                <CardTitle className="font-headline text-2xl">{category.name}</CardTitle>
               </CardHeader>
-              <CardContent className="flex-grow">
-                <ul className="space-y-3">
+              <CardContent className="flex-grow flex flex-col pt-2">
+                <CardDescription className="mb-4">{category.description}</CardDescription>
+                <ul className="space-y-3 mt-auto">
                   {category.tools.map((tool) => (
                     <li key={tool.name}>
                       <Link
