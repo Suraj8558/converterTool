@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -52,38 +53,86 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
     setFiles(files.filter((_, i) => i !== index));
   };
   
-  const handleConvert = () => {
+  const handleConvert = async () => {
     if (files.length === 0) return;
     setIsConverting(true);
     setConversionComplete(false);
     setConversionProgress(0);
 
-    const interval = setInterval(() => {
+    // Simulate progress while "converting"
+    const progressInterval = setInterval(() => {
       setConversionProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          
-          const newConvertedFiles = files.map(file => {
-            const originalName = file.name.substring(0, file.name.lastIndexOf('.'));
-            const newName = `${originalName}.${toType}`;
-            
-            // This is a dummy conversion. In a real app, this would be the converted file blob.
-            const dummyContent = `This is a simulated converted file: ${newName} from ${file.name}`;
-            const blob = new Blob([dummyContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            
-            return { name: newName, url };
-          });
-          setConvertedFiles(newConvertedFiles);
-
-          setIsConverting(false);
-          setConversionComplete(true);
-          return 100;
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
         }
         return prev + 10;
       });
-    }, 200);
+    }, 150);
+
+    const isImageConversion = ['png', 'jpg', 'jpeg', 'webp'].includes(toType.toLowerCase());
+
+    const createDummyImageBlob = (newName: string, type: string): Promise<Blob> => {
+      return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('Failed to get canvas context'));
+
+        ctx.fillStyle = '#f1f5f9'; // slate-100
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0f172a'; // slate-900
+        ctx.font = 'bold 20px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`File converted to .${type}`, canvas.width / 2, canvas.height / 2 - 15);
+        ctx.font = '14px Inter, sans-serif';
+        ctx.fillText(newName, canvas.width / 2, canvas.height / 2 + 15);
+
+        const mimeType = type === 'jpg' ? 'image/jpeg' : `image/${type}`;
+        canvas.toBlob(blob => {
+          if (blob) resolve(blob);
+          else reject(new Error('Canvas to Blob conversion failed'));
+        }, mimeType, 0.9);
+      });
+    };
+
+    try {
+      const conversionPromises = files.map(async (file) => {
+        const originalName = file.name.lastIndexOf('.') > -1 
+          ? file.name.substring(0, file.name.lastIndexOf('.'))
+          : file.name;
+        const newName = `${originalName}.${toType}`;
+        
+        let blob: Blob;
+        if (isImageConversion) {
+          blob = await createDummyImageBlob(newName, toType);
+        } else {
+          // Fallback for non-image types
+          const dummyContent = `This is a simulated converted file: ${newName} from ${file.name}`;
+          blob = new Blob([dummyContent], { type: 'application/octet-stream' });
+        }
+
+        const url = URL.createObjectURL(blob);
+        return { name: newName, url };
+      });
+
+      const newConvertedFiles = await Promise.all(conversionPromises);
+      
+      clearInterval(progressInterval);
+      setConversionProgress(100);
+      setConvertedFiles(newConvertedFiles);
+      setConversionComplete(true);
+    } catch (error) {
+      console.error("File conversion simulation failed:", error);
+      clearInterval(progressInterval);
+      // Here you would show an error to the user
+    } finally {
+      setIsConverting(false);
+    }
   };
+
 
   const handleDownload = (file: ConvertedFile) => {
     const link = document.createElement('a');
