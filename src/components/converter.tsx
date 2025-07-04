@@ -6,6 +6,56 @@ import { UploadCloud, File as FileIcon, X, Download, RotateCcw } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+
+const convertImageOnClient = (file: File, toType: string): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      if (!event.target?.result) {
+        return reject(new Error("Failed to read file"));
+      }
+      const img = new Image();
+      img.src = event.target.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Could not get canvas context'));
+        }
+        
+        // If converting to a format that doesn't support transparency (like JPG),
+        // fill the background with white.
+        const lowerCaseToType = toType.toLowerCase();
+        if (lowerCaseToType === 'jpg' || lowerCaseToType === 'jpeg') {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        ctx.drawImage(img, 0, 0);
+        
+        const mimeType = `image/${lowerCaseToType === 'jpg' ? 'jpeg' : lowerCaseToType}`;
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Canvas to Blob conversion failed'));
+          }
+        }, mimeType, 0.9); // Quality setting for formats like JPEG
+      };
+      img.onerror = () => {
+        reject(new Error('Failed to load image'));
+      };
+    };
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+  });
+};
 
 interface ConverterProps {
   title: string;
@@ -25,6 +75,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
   const [conversionProgress, setConversionProgress] = useState(0);
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
   const [conversionComplete, setConversionComplete] = useState(false);
+  const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -72,32 +123,6 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
 
     const isImageConversion = ['png', 'jpg', 'jpeg', 'webp'].includes(toType.toLowerCase());
 
-    const createDummyImageBlob = (newName: string, type: string): Promise<Blob> => {
-      return new Promise((resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 400;
-        canvas.height = 300;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return reject(new Error('Failed to get canvas context'));
-
-        ctx.fillStyle = '#f1f5f9'; // slate-100
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#0f172a'; // slate-900
-        ctx.font = 'bold 20px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(`File converted to .${type}`, canvas.width / 2, canvas.height / 2 - 15);
-        ctx.font = '14px Inter, sans-serif';
-        ctx.fillText(newName, canvas.width / 2, canvas.height / 2 + 15);
-
-        const mimeType = type === 'jpg' ? 'image/jpeg' : `image/${type}`;
-        canvas.toBlob(blob => {
-          if (blob) resolve(blob);
-          else reject(new Error('Canvas to Blob conversion failed'));
-        }, mimeType, 0.9);
-      });
-    };
-
     try {
       const conversionPromises = files.map(async (file) => {
         const originalName = file.name.lastIndexOf('.') > -1 
@@ -107,7 +132,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
         
         let blob: Blob;
         if (isImageConversion) {
-          blob = await createDummyImageBlob(newName, toType);
+          blob = await convertImageOnClient(file, toType);
         } else {
           // Fallback for non-image types
           const dummyContent = `This is a simulated converted file: ${newName} from ${file.name}`;
@@ -125,9 +150,13 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
       setConvertedFiles(newConvertedFiles);
       setConversionComplete(true);
     } catch (error) {
-      console.error("File conversion simulation failed:", error);
+      console.error("File conversion failed:", error);
       clearInterval(progressInterval);
-      // Here you would show an error to the user
+      toast({
+        title: 'Conversion Failed',
+        description: 'An error occurred during file conversion. Please check the file format and try again.',
+        variant: 'destructive',
+      });
     } finally {
       setIsConverting(false);
     }
