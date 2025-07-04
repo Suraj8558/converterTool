@@ -68,7 +68,7 @@ export default function Header() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-full max-w-sm">
+            <SheetContent side="left" className="w-full max-w-sm p-0">
               <Link href="/" className="flex items-center space-x-2 p-4 border-b" onClick={() => setOpen(false)}>
                 <SheetIcon className="h-6 w-6 text-primary" />
                 <span className="font-bold font-headline">ConvertIQ</span>
@@ -120,7 +120,7 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted focus:bg-accent focus:text-accent-foreground',
             className
           )}
           {...props}

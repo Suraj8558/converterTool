@@ -17,7 +17,7 @@ type ToolCategory = {
 export const toolCategories: ToolCategory[] = [
   {
     name: 'Image Tools',
-    icon: <ImageIcon className="h-8 w-8 text-primary" />,
+    icon: <ImageIcon className="h-10 w-10 text-primary" />,
     description: 'Tools to convert, edit, and manipulate images.',
     tools: [
       { name: 'JPG to PNG', href: '/jpg-to-png', description: 'Convert JPG to PNG format.' },
@@ -29,7 +29,7 @@ export const toolCategories: ToolCategory[] = [
   },
   {
     name: 'File Converters',
-    icon: <File className="h-8 w-8 text-primary" />,
+    icon: <File className="h-10 w-10 text-primary" />,
     description: 'Convert various file formats for documents, audio, and video.',
     tools: [
       { name: 'MP4 to AVI', href: '/mp4-to-avi', description: 'Convert MP4 video to AVI format.' },
@@ -40,7 +40,7 @@ export const toolCategories: ToolCategory[] = [
   },
   {
     name: 'PDF Tools',
-    icon: <FileText className="h-8 w-8 text-primary" />,
+    icon: <FileText className="h-10 w-10 text-primary" />,
     description: 'A suite of tools to manage and manipulate PDF files.',
     tools: [
       { name: 'PDF to Word', href: '#', description: 'Convert PDF files back to Word documents.' },
@@ -51,7 +51,7 @@ export const toolCategories: ToolCategory[] = [
   },
   {
     name: 'SEO Tools',
-    icon: <Search className="h-8 w-8 text-primary" />,
+    icon: <Search className="h-10 w-10 text-primary" />,
     description: 'Optimize your website for better search engine rankings.',
     tools: [
       { name: 'Meta Tag Generator', href: '/seo/meta-tag-generator', description: 'Generate SEO-friendly meta tags.' },

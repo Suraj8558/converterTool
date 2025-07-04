@@ -27,8 +27,6 @@ const convertImageOnClient = (file: File, toType: string): Promise<Blob> => {
           return reject(new Error('Could not get canvas context'));
         }
         
-        // If converting to a format that doesn't support transparency (like JPG),
-        // fill the background with white.
         const lowerCaseToType = toType.toLowerCase();
         if (lowerCaseToType === 'jpg' || lowerCaseToType === 'jpeg') {
           ctx.fillStyle = '#FFFFFF';
@@ -45,7 +43,7 @@ const convertImageOnClient = (file: File, toType: string): Promise<Blob> => {
           } else {
             reject(new Error('Canvas to Blob conversion failed'));
           }
-        }, mimeType, 0.9); // Quality setting for formats like JPEG
+        }, mimeType, 0.9);
       };
       img.onerror = () => {
         reject(new Error('Failed to load image'));
@@ -110,7 +108,6 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
     setConversionComplete(false);
     setConversionProgress(0);
 
-    // Simulate progress while "converting"
     const progressInterval = setInterval(() => {
       setConversionProgress(prev => {
         if (prev >= 95) {
@@ -196,7 +193,6 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
   };
   
   const handleReset = () => {
-      // Revoke object URLs to free up memory
       convertedFiles.forEach(file => URL.revokeObjectURL(file.url));
       
       setFiles([]);
@@ -217,7 +213,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
           {!conversionComplete ? (
             <>
               <div 
-                className="border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors bg-background/50"
+                className="border border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted transition-colors bg-muted/50"
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onClick={() => document.getElementById('file-upload')?.click()}
@@ -263,7 +259,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
               <Button 
                 onClick={handleConvert} 
                 disabled={files.length === 0 || isConverting}
-                className="w-full h-12 text-lg font-bold bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-300 transform hover:scale-105"
+                className="w-full h-12 text-lg font-bold transition-all duration-300 transform hover:scale-105"
               >
                   Convert to .{toType}
               </Button>

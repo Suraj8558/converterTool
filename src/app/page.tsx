@@ -1,17 +1,17 @@
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Search, ArrowRight } from 'lucide-react';
+import { Search, ArrowRight, ShieldCheck, Star, BadgePercent } from 'lucide-react';
 import { toolCategories } from '@/lib/tools';
 
 export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <section className="text-center">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 font-headline">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 font-headline bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
           All-in-One Converter & SEO Tools
         </h1>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+        <p className="text-lg md:text-xl text-muted-foreground max-w-4xl mx-auto mb-8">
           Your complete suite of tools to convert files, manage PDFs, and boost your website's SEO.
         </p>
         <div className="max-w-xl mx-auto">
@@ -26,13 +26,13 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-16 md:mt-24 space-y-16">
+      <section className="mt-16 md:mt-24 space-y-20">
         {toolCategories.map((category) => (
           <div key={category.name}>
-            <div className="flex items-start gap-4">
-              <div className="mt-1">{category.icon}</div>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-muted rounded-full">{category.icon}</div>
               <div>
-                <h2 className="text-3xl font-bold font-headline">{category.name}</h2>
+                <h2 className="text-4xl font-bold font-headline">{category.name}</h2>
                 <p className="text-muted-foreground mt-1 max-w-2xl">{category.description}</p>
               </div>
             </div>
@@ -59,19 +59,28 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="mt-16 md:mt-24 text-center bg-card py-16 rounded-xl shadow-sm">
+      <section className="mt-16 md:mt-24 text-center bg-card py-16 rounded-2xl shadow-sm border">
         <h2 className="text-3xl font-bold mb-4 font-headline">Why Choose ConvertIQ?</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto mb-12">We provide reliable, fast, and secure tools to make your digital life easier.</p>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="text-center p-4">
+            <div className="text-center p-4 flex flex-col items-center">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted text-primary mb-4">
+                    <ShieldCheck className="h-6 w-6" />
+                </div>
                 <h3 className="text-xl font-semibold mb-2 font-headline">Secure & Private</h3>
                 <p className="text-muted-foreground">Your files are your own. We automatically delete them from our servers after a few hours.</p>
             </div>
-            <div className="text-center p-4">
+            <div className="text-center p-4 flex flex-col items-center">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted text-primary mb-4">
+                    <Star className="h-6 w-6" />
+                </div>
                 <h3 className="text-xl font-semibold mb-2 font-headline">High Quality Conversions</h3>
                 <p className="text-muted-foreground">Our tools preserve the quality of your files, so you get the best results every time.</p>
             </div>
-            <div className="text-center p-4">
+            <div className="text-center p-4 flex flex-col items-center">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted text-primary mb-4">
+                    <BadgePercent className="h-6 w-6" />
+                </div>
                 <h3 className="text-xl font-semibold mb-2 font-headline">Completely Free</h3>
                 <p className="text-muted-foreground">All our tools are free to use, with no hidden costs or subscriptions required.</p>
             </div>
