@@ -27,7 +27,7 @@ export const toolCategories: ToolCategory[] = [
       { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert PNG images to the next-gen AVIF format.' },
       { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your desired dimensions.' },
       { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create standards-compliant passport photos.' },
-      { name: 'GIF to MP4', href: '#', description: 'Convert animated GIF to MP4 video.' },
+      { name: 'GIF to MP4', href: '/gif-to-mp4', description: 'Convert animated GIF to MP4 video.' },
     ],
   },
   {
