@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Search, ArrowRight } from 'lucide-react';
 import { toolCategories } from '@/lib/tools';
 
@@ -26,33 +26,37 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mt-16 md:mt-24">
-        <div className="grid gap-8 md:grid-cols-2">
-          {toolCategories.map((category) => (
-            <Card key={category.name} className="flex flex-col hover:shadow-xl transition-shadow duration-300 rounded-xl">
-              <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                {category.icon}
-                <CardTitle className="font-headline text-2xl">{category.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow flex flex-col pt-2">
-                <CardDescription className="mb-4">{category.description}</CardDescription>
-                <ul className="space-y-3 mt-auto">
-                  {category.tools.map((tool) => (
-                    <li key={tool.name}>
-                      <Link
-                        href={tool.href}
-                        className="flex items-center justify-between text-muted-foreground hover:text-foreground transition-colors group"
-                      >
-                        <span>{tool.name}</span>
-                        <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <section className="mt-16 md:mt-24 space-y-16">
+        {toolCategories.map((category) => (
+          <div key={category.name}>
+            <div className="flex items-start gap-4">
+              <div className="mt-1">{category.icon}</div>
+              <div>
+                <h2 className="text-3xl font-bold font-headline">{category.name}</h2>
+                <p className="text-muted-foreground mt-1 max-w-2xl">{category.description}</p>
+              </div>
+            </div>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {category.tools.map((tool) => (
+                <Link href={tool.href} key={tool.name} className="block group">
+                  <Card className="h-full hover:shadow-lg transition-all duration-300 rounded-xl flex flex-col border hover:border-primary/60">
+                    <CardHeader>
+                      <CardTitle className="text-lg font-headline">{tool.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      <p className="text-sm text-muted-foreground">{tool.description}</p>
+                    </CardContent>
+                    <CardFooter className="pt-4">
+                      <div className="w-full flex justify-end">
+                        <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
       <section className="mt-16 md:mt-24 text-center bg-card py-16 rounded-xl shadow-sm">
