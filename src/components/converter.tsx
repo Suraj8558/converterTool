@@ -118,7 +118,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
       });
     }, 150);
 
-    const isImageConversion = ['png', 'jpg', 'jpeg', 'webp'].includes(toType.toLowerCase());
+    const isImageConversion = ['png', 'jpg', 'jpeg', 'webp', 'avif'].includes(toType.toLowerCase());
 
     try {
       const conversionPromises = files.map(async (file) => {

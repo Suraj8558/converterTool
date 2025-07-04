@@ -22,7 +22,9 @@ export const toolCategories: ToolCategory[] = [
     tools: [
       { name: 'JPG to PNG', href: '/jpg-to-png', description: 'Convert JPG to PNG format.' },
       { name: 'PNG to JPG', href: '/png-to-jpg', description: 'Convert PNG to JPG format.' },
-      { name: 'WebP to JPG', href: '#', description: 'Convert WebP to JPG format.' },
+      { name: 'WebP to JPG', href: '/webp-to-jpg', description: 'Convert WebP to JPG format.' },
+      { name: 'JPG to AVIF', href: '/jpg-to-avif', description: 'Convert JPG images to the next-gen AVIF format.' },
+      { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert PNG images to the next-gen AVIF format.' },
       { name: 'GIF to MP4', href: '#', description: 'Convert animated GIF to MP4 video.' },
       { name: 'Image Resizer', href: '#', description: 'Resize images to your desired dimensions.' },
     ],
