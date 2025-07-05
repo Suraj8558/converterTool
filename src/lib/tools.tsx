@@ -1,4 +1,4 @@
-import { ImageIcon, File, FileText, Search, Scissors, UserSquare, Shrink, Wand2 } from 'lucide-react';
+import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -52,17 +52,6 @@ export const toolCategories: ToolCategory[] = [
       { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create professional, secure PDF files from your Word documents in just a few clicks.' },
       { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into a single, organized document for easy management and sharing.' },
       { name: 'PDF Split', href: '/pdf-split', description: 'Extract specific pages or split a large PDF into multiple smaller files by page range or size.' },
-    ],
-  },
-  {
-    name: 'SEO Tools',
-    icon: <Search className="h-10 w-10 text-primary" />,
-    description: 'Optimize your website for better search engine rankings.',
-    tools: [
-      { name: 'Meta Tag Generator', href: '/seo/meta-tag-generator', description: 'Generate SEO-friendly meta titles, descriptions, and keywords for your website using AI.' },
-      { name: 'Keyword Research', href: '/seo/keyword-research', description: 'Discover valuable keyword ideas, analyze search volume, and check difficulty with our AI tool.' },
-      { name: 'Plagiarism Checker', href: '/seo/plagiarism-checker', description: 'Ensure your content is original by checking it against web sources for potential plagiarism.' },
-      { name: 'Backlink Checker', href: '/seo/backlink-checker', description: 'Get a detailed analysis of any domain’s backlink profile to inform your SEO strategy.' },
     ],
   },
 ];
