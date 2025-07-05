@@ -73,7 +73,7 @@ export default function Home() {
                         </div>
                       </CardHeader>
                       <CardContent className="flex-grow">
-                        <p className="text-sm text-muted-foreground">{tool.description}</p>
+                        <p className="text-sm text-muted-foreground min-h-[80px]">{tool.description}</p>
                       </CardContent>
                       <CardFooter className="pt-4">
                         <div className="w-full flex justify-end">
