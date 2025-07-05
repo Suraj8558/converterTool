@@ -41,7 +41,7 @@ const removeBackgroundFlow = ai.defineFlow(
         model: 'googleai/gemini-2.0-flash-preview-image-generation',
         prompt: [
             {media: {url: input.photoDataUri}},
-            {text: 'Remove the background from this image. The output must be a PNG image with a transparent background.'}
+            {text: 'You are an expert photo editor. Your task is to accurately remove the background from the provided image. Isolate the main subject and place it on a transparent background. The final output must be a PNG image.'}
         ],
         config: {
             responseModalities: ['TEXT', 'IMAGE'],

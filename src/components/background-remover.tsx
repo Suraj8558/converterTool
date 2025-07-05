@@ -50,7 +50,7 @@ export function BackgroundRemover() {
             const photoDataUri = await fileToDataUri(originalFile);
             const result = await removeBackground({ photoDataUri });
             
-            if (result.processedPhotoDataUri) {
+            if (result && result.processedPhotoDataUri) {
                 setProcessedImageUrl(result.processedPhotoDataUri);
             } else {
                 throw new Error("The AI failed to return an image.");
