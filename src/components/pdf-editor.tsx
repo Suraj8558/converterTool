@@ -1,22 +1,49 @@
+
 'use client';
 
-import { useState } from 'react';
-import { PDFDocument } from 'pdf-lib';
+import { useState, useRef } from 'react';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import * as pdfjs from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { UploadCloud, FilePlus, Trash2, Download, RotateCcw, Loader2 } from 'lucide-react';
+import { UploadCloud, FilePlus, Trash2, Download, RotateCcw, Loader2, Type } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
 
 // Use a CDN for the worker to avoid build configuration issues with Next.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+type EditorMode = 'view' | 'addText';
+type TextDialogState = {
+    isOpen: boolean;
+    pageIndex: number | null;
+    x: number | null;
+    y: number | null;
+};
 
 export function PdfEditor() {
     const [file, setFile] = useState<File | null>(null);
     const [pdfDoc, setPdfDoc] = useState<PDFDocument | null>(null);
     const [pageImageUrls, setPageImageUrls] = useState<string[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [editorMode, setEditorMode] = useState<EditorMode>('view');
+    const [textDialogState, setTextDialogState] = useState<TextDialogState>({ isOpen: false, pageIndex: null, x: null, y: null });
+    const [textToAdd, setTextToAdd] = useState('');
+    const [updatingPageIndex, setUpdatingPageIndex] = useState<number | null>(null);
+    const pageContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
     const { toast } = useToast();
 
     const renderPage = async (pdf: PDFDocumentProxy, pageNumber: number): Promise<string> => {
@@ -126,6 +153,80 @@ export function PdfEditor() {
             description: 'A new blank page has been added to the end of the document.',
         });
     };
+    
+    const handlePageClick = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
+        if (editorMode !== 'addText' || !pageContainerRefs.current[index]) return;
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        setTextDialogState({ isOpen: true, pageIndex: index, x, y });
+    };
+
+    const handleAddText = async () => {
+        if (!pdfDoc || textDialogState.pageIndex === null || textDialogState.x === null || textDialogState.y === null || !textToAdd) {
+            return;
+        }
+
+        const { pageIndex, x, y } = textDialogState;
+        setUpdatingPageIndex(pageIndex);
+        // Close dialog immediately
+        setTextDialogState({ isOpen: false, pageIndex: null, x: null, y: null });
+        setTextToAdd('');
+        setEditorMode('view');
+
+        try {
+            const pages = pdfDoc.getPages();
+            const page = pages[pageIndex];
+            
+            const containerRef = pageContainerRefs.current[pageIndex];
+            if (!containerRef) throw new Error("Page container not found");
+            
+            const { width: displayWidth, height: displayHeight } = containerRef.getBoundingClientRect();
+            const { width: pageWidth, height: pageHeight } = page.getSize();
+            
+            const pdfX = (x / displayWidth) * pageWidth;
+            const pdfY = pageHeight - ((y / displayHeight) * pageHeight);
+
+            const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            page.drawText(textToAdd, {
+                x: pdfX,
+                y: pdfY,
+                font: helveticaFont,
+                size: 12,
+                color: rgb(0, 0, 0),
+            });
+            
+            const pdfBytes = await pdfDoc.save();
+            const loadedPdfDoc = await PDFDocument.load(pdfBytes);
+            setPdfDoc(loadedPdfDoc);
+
+            const pdfJsDoc = await pdfjs.getDocument({ data: pdfBytes }).promise;
+            const newImageUrl = await renderPage(pdfJsDoc, pageIndex + 1);
+            
+            setPageImageUrls(currentUrls => {
+                const newUrls = [...currentUrls];
+                newUrls[pageIndex] = newImageUrl;
+                return newUrls;
+            });
+
+            toast({
+                title: 'Text Added',
+                description: 'The text has been added to the page.',
+            });
+
+        } catch (error) {
+            console.error("Failed to add text:", error);
+            toast({
+                title: 'Error Adding Text',
+                description: 'Could not add text to the PDF.',
+                variant: 'destructive',
+            });
+        } finally {
+            setUpdatingPageIndex(null);
+        }
+    };
 
     const handleDownload = async () => {
         if (!pdfDoc || !file) return;
@@ -155,13 +256,14 @@ export function PdfEditor() {
         setPdfDoc(null);
         setPageImageUrls([]);
         setIsProcessing(false);
+        setEditorMode('view');
     };
 
     return (
         <Card className="rounded-xl shadow-lg w-full">
             <CardHeader>
                 <CardTitle className="text-3xl font-bold font-headline">PDF Editor</CardTitle>
-                <CardDescription>A simple editor to add or remove pages from your PDF files.</CardDescription>
+                <CardDescription>A simple editor to add text or pages to your PDF files.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 {!file ? (
@@ -180,12 +282,35 @@ export function PdfEditor() {
                     </div>
                 ) : (
                     <div className="space-y-6">
+                        <Card className="p-4 bg-muted/50">
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                <Button onClick={() => setEditorMode('addText')} variant={editorMode === 'addText' ? 'secondary' : 'outline'}>
+                                    <Type className="mr-2 h-4 w-4" />
+                                    Add Text
+                                </Button>
+                                <Button onClick={handleAddBlankPage} variant="outline">
+                                    <FilePlus className="mr-2 h-4 w-4" />
+                                    Add Blank Page
+                                </Button>
+                                <Button onClick={handleDownload} className="bg-gradient-to-r from-primary to-tertiary text-primary-foreground hover:saturate-150 transition-all duration-300">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Download Modified PDF
+                                </Button>
+                            </div>
+                            {editorMode === 'addText' && <p className="text-center text-sm text-primary mt-2">Click on a page to add text.</p>}
+                        </Card>
+                        
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {pageImageUrls.map((url, index) => (
-                                <div key={index} className="relative group border rounded-md overflow-hidden aspect-[7/9] bg-white">
+                                <div 
+                                    key={index} 
+                                    ref={el => pageContainerRefs.current[index] = el}
+                                    className={`relative group border rounded-md overflow-hidden aspect-[7/9] bg-white ${editorMode === 'addText' ? 'cursor-text' : ''}`}
+                                    onClick={(e) => handlePageClick(e, index)}
+                                >
                                     <img src={url} alt={`Page ${index + 1}`} className="w-full h-full object-contain" />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <Button variant="destructive" size="icon" onClick={() => handleDeletePage(index)}>
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Button variant="destructive" size="icon" onClick={(e) => { e.stopPropagation(); handleDeletePage(index); }}>
                                             <Trash2 className="h-4 w-4" />
                                             <span className="sr-only">Delete Page {index + 1}</span>
                                         </Button>
@@ -193,26 +318,47 @@ export function PdfEditor() {
                                     <div className="absolute bottom-1 right-1 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded">
                                         {index + 1}
                                     </div>
+                                    {updatingPageIndex === index && (
+                                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                                            <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Button onClick={handleAddBlankPage} variant="outline">
-                                <FilePlus className="mr-2 h-4 w-4" />
-                                Add Blank Page
-                            </Button>
-                            <Button onClick={handleDownload} className="bg-gradient-to-r from-primary to-tertiary text-primary-foreground hover:saturate-150 transition-all duration-300">
-                                <Download className="mr-2 h-4 w-4" />
-                                Download Modified PDF
-                            </Button>
-                        </div>
                          <Button onClick={resetState} variant="outline" className="w-full">
                             <RotateCcw className="mr-2 h-4 w-4" />
                             Start Over with New File
                         </Button>
                     </div>
                 )}
+                 <AlertDialog open={textDialogState.isOpen} onOpenChange={(isOpen) => !isOpen && setTextDialogState({ isOpen: false, pageIndex: null, x: null, y: null })}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Add Text</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Enter the text you want to add to the page.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="text-to-add" className="text-right">Text</Label>
+                                <Input
+                                    id="text-to-add"
+                                    value={textToAdd}
+                                    onChange={(e) => setTextToAdd(e.target.value)}
+                                    className="col-span-3"
+                                    autoFocus
+                                />
+                            </div>
+                        </div>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setTextDialogState({ isOpen: false, pageIndex: null, x: null, y: null })}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleAddText}>Add Text</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </CardContent>
         </Card>
     );
