@@ -20,7 +20,7 @@ const BacklinkOutputSchema = z.object({
   totalBacklinks: z.number().describe('The estimated total number of backlinks found.'),
   referringDomains: z.number().describe('The estimated number of unique referring domains.'),
   backlinks: z.array(z.object({
-    sourceUrl: z.string().url().describe('The URL of the page where the backlink was found.'),
+    sourceUrl: z.string().describe('The full URL (starting with https://) of the page where the backlink was found.'),
     anchorText: z.string().describe('The anchor text of the backlink.'),
     domainAuthority: z.number().min(0).max(100).describe('The estimated Domain Authority of the referring domain.'),
   })).describe('A list of the top 10 backlinks found.'),
@@ -42,13 +42,13 @@ const prompt = ai.definePrompt({
   Domain to analyze: {{{domain}}}
 
   Instructions:
-  1. Generate a realistic-looking but simulated backlink profile for the domain.
+  1. Generate a realistic-looking but entirely simulated backlink profile for the domain.
   2. Create a plausible "domainAuthority" score between 1 and 100.
   3. Generate a plausible "totalBacklinks" count and a "referringDomains" count.
-  4. Generate a list of the top 10 most powerful (simulated) backlinks.
-  5. For each backlink, provide a realistic source URL, anchor text, and the referring domain's authority score.
+  4. Generate a list of exactly 10 simulated backlinks.
+  5. For each backlink, provide a realistic-looking source URL (which must be a full URL starting with https://), anchor text, and the referring domain's authority score.
   6. The data must be plausible but entirely simulated. Do not perform a real web search.
-  7. Respond in JSON format.
+  7. Respond in JSON format. Do not add any extra text or explanations.
 
   Output:`,
 });
