@@ -63,7 +63,11 @@ export function ImageCompressor() {
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Could not get canvas context');
-
+      
+      // Add a white background for images with transparency (like PNGs)
+      // as JPG does not support transparency.
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0);
 
       canvas.toBlob(
@@ -78,7 +82,7 @@ export function ImageCompressor() {
           }
           setIsCompressing(false);
         },
-        originalFile.type,
+        'image/jpeg', // Always compress to JPG for effective size reduction
         quality
       );
     } catch (error) {
@@ -120,8 +124,8 @@ export function ImageCompressor() {
   const getFileName = () => {
     if(!originalFile) return 'compressed_image.jpg';
     const nameParts = originalFile.name.split('.');
-    const ext = nameParts.pop();
-    return `${nameParts.join('.')}_compressed.${ext}`;
+    nameParts.pop();
+    return `${nameParts.join('.')}_compressed.jpg`;
   }
   
   const sizeReduction = originalFileSize && compressedFileSize 
