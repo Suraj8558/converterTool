@@ -28,8 +28,8 @@ export const toolCategories: ToolCategory[] = [
       { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your desired dimensions.' },
       { name: 'Image Compressor', href: '/image-compressor', description: 'Reduce image file sizes with adjustable quality.' },
       { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create standards-compliant passport photos.' },
-      { name: 'Background Remover', href: '#', description: 'Automatically remove image backgrounds using AI.' },
-      { name: 'GIF to MP4', href: '#', description: 'Convert animated GIF to MP4 video.' },
+      { name: 'Background Remover', href: '/background-remover', description: 'Automatically remove image backgrounds using AI.' },
+      { name: 'GIF to MP4', href: '/gif-to-mp4', description: 'Convert animated GIF to MP4 video.' },
     ],
   },
   {
@@ -60,7 +60,7 @@ export const toolCategories: ToolCategory[] = [
     description: 'Optimize your website for better search engine rankings.',
     tools: [
       { name: 'Meta Tag Generator', href: '/seo/meta-tag-generator', description: 'Generate SEO-friendly meta tags.' },
-      { name: 'Keyword Research', href: '#', description: 'Find keywords for your content strategy.' },
+      { name: 'Keyword Research', href: '/seo/keyword-research', description: 'Find keywords for your content strategy.' },
       { name: 'Plagiarism Checker', href: '#', description: 'Check for duplicate content.' },
       { name: 'Backlink Checker', href: '#', description: 'Analyze your website\'s backlink profile.' },
     ],
