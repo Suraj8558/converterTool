@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toolCategories } from '@/lib/tools';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function Header() {
   const [open, setOpen] = React.useState(false);
@@ -68,30 +69,32 @@ export default function Header() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-full max-w-sm p-0">
+            <SheetContent side="left" className="w-full max-w-sm p-0 flex flex-col">
               <Link href="/" className="flex items-center space-x-2 p-4 border-b" onClick={() => setOpen(false)}>
                 <SheetIcon className="h-6 w-6 text-primary" />
                 <span className="font-bold font-headline">ConvertIQ</span>
               </Link>
-              <div className="flex flex-col space-y-2 p-4">
-                {toolCategories.map((category) => (
-                  <div key={category.name} className="pt-2">
-                    <h4 className="font-semibold mb-2">{category.name}</h4>
-                    <div className="flex flex-col space-y-1">
-                    {category.tools.map((tool) => (
-                      <Link
-                        key={tool.name}
-                        href={tool.href}
-                        className="text-muted-foreground hover:text-foreground p-2 rounded-md -ml-2"
-                        onClick={() => setOpen(false)}
-                      >
-                        {tool.name}
-                      </Link>
-                    ))}
+              <ScrollArea className="flex-1">
+                <div className="flex flex-col space-y-2 p-4">
+                  {toolCategories.map((category) => (
+                    <div key={category.name} className="pt-2">
+                      <h4 className="font-semibold mb-2">{category.name}</h4>
+                      <div className="flex flex-col space-y-1">
+                      {category.tools.map((tool) => (
+                        <Link
+                          key={tool.name}
+                          href={tool.href}
+                          className="text-muted-foreground hover:text-foreground p-2 rounded-md -ml-2"
+                          onClick={() => setOpen(false)}
+                        >
+                          {tool.name}
+                        </Link>
+                      ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </SheetContent>
           </Sheet>
           <div className="flex-1 flex justify-center">
