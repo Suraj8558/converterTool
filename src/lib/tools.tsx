@@ -1,4 +1,4 @@
-import { ImageIcon, File, FileText, Search, Scissors, UserSquare, Shrink } from 'lucide-react';
+import { ImageIcon, File, FileText, Search, Scissors, UserSquare, Shrink, Wand2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -28,6 +28,7 @@ export const toolCategories: ToolCategory[] = [
       { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your desired dimensions.' },
       { name: 'Image Compressor', href: '/image-compressor', description: 'Reduce image file sizes with adjustable quality.' },
       { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create standards-compliant passport photos.' },
+      { name: 'Background Remover', href: '/background-remover', description: 'Automatically remove image backgrounds using AI.' },
       { name: 'GIF to MP4', href: '/gif-to-mp4', description: 'Convert animated GIF to MP4 video.' },
     ],
   },
