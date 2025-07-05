@@ -23,6 +23,7 @@ export const toolCategories: ToolCategory[] = [
       { name: 'JPG to PNG', href: '/jpg-to-png', description: 'Easily convert your JPG images to high-quality PNG format, which supports transparency.' },
       { name: 'PNG to JPG', href: '/png-to-jpg', description: 'Quickly convert your PNG images to the universally compatible JPG format, perfect for web use.' },
       { name: 'SVG to PNG', href: '/svg-to-png', description: 'Convert your scalable SVG vector files into high-quality PNG images with transparent backgrounds.' },
+      { name: 'PNG to SVG', href: '/png-to-svg', description: 'Convert your PNG images into scalable SVG vector graphics using AI-powered tracing.' },
       { name: 'WebP to JPG', href: '/webp-to-jpg', description: 'Convert modern WebP images to the standard JPG format for wider compatibility across devices.' },
       { name: 'JPG to AVIF', href: '/jpg-to-avif', description: 'Transform your JPG images into the next-generation AVIF format for superior compression and quality.' },
       { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert your PNG images to high-quality, efficient AVIF files, ideal for modern web applications.' },
