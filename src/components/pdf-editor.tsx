@@ -8,31 +8,21 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { UploadCloud, FilePlus, Trash2, Download, RotateCcw, Loader2, Type } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { UploadCloud, FilePlus, Trash2, Download, RotateCcw, Loader2, Type, CheckCircle, XCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 
 
 // Use a CDN for the worker to avoid build configuration issues with Next.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 type EditorMode = 'view' | 'addText';
-type TextDialogState = {
-    isOpen: boolean;
-    pageIndex: number | null;
-    x: number | null;
-    y: number | null;
+type ActiveTextBox = {
+  pageIndex: number;
+  x: number;
+  y: number;
+  value: string;
 };
+
 
 export function PdfEditor() {
     const [file, setFile] = useState<File | null>(null);
@@ -40,8 +30,7 @@ export function PdfEditor() {
     const [pageImageUrls, setPageImageUrls] = useState<string[]>([]);
     const [isProcessing, setIsProcessing] = useState(false);
     const [editorMode, setEditorMode] = useState<EditorMode>('view');
-    const [textDialogState, setTextDialogState] = useState<TextDialogState>({ isOpen: false, pageIndex: null, x: null, y: null });
-    const [textToAdd, setTextToAdd] = useState('');
+    const [activeTextBox, setActiveTextBox] = useState<ActiveTextBox | null>(null);
     const [updatingPageIndex, setUpdatingPageIndex] = useState<number | null>(null);
     const pageContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
     const { toast } = useToast();
@@ -155,26 +144,24 @@ export function PdfEditor() {
     };
     
     const handlePageClick = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
-        if (editorMode !== 'addText' || !pageContainerRefs.current[index]) return;
+        if (editorMode !== 'addText' || activeTextBox || !pageContainerRefs.current[index]) return;
 
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        setTextDialogState({ isOpen: true, pageIndex: index, x, y });
+        setActiveTextBox({ pageIndex: index, x, y, value: '' });
     };
 
-    const handleAddText = async () => {
-        if (!pdfDoc || textDialogState.pageIndex === null || textDialogState.x === null || textDialogState.y === null || !textToAdd) {
+    const handleSaveText = async () => {
+        if (!pdfDoc || !activeTextBox || !activeTextBox.value) {
+            setActiveTextBox(null);
             return;
         }
 
-        const { pageIndex, x, y } = textDialogState;
+        const { pageIndex, x, y, value } = activeTextBox;
         setUpdatingPageIndex(pageIndex);
-        // Close dialog immediately
-        setTextDialogState({ isOpen: false, pageIndex: null, x: null, y: null });
-        setTextToAdd('');
-        setEditorMode('view');
+        setActiveTextBox(null);
 
         try {
             const pages = pdfDoc.getPages();
@@ -190,7 +177,7 @@ export function PdfEditor() {
             const pdfY = pageHeight - ((y / displayHeight) * pageHeight);
 
             const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-            page.drawText(textToAdd, {
+            page.drawText(value, {
                 x: pdfX,
                 y: pdfY,
                 font: helveticaFont,
@@ -207,6 +194,7 @@ export function PdfEditor() {
             
             setPageImageUrls(currentUrls => {
                 const newUrls = [...currentUrls];
+                URL.revokeObjectURL(currentUrls[pageIndex]); // Clean up old object URL
                 newUrls[pageIndex] = newImageUrl;
                 return newUrls;
             });
@@ -252,11 +240,13 @@ export function PdfEditor() {
     };
 
     const resetState = () => {
+        pageImageUrls.forEach(url => URL.revokeObjectURL(url));
         setFile(null);
         setPdfDoc(null);
         setPageImageUrls([]);
         setIsProcessing(false);
         setEditorMode('view');
+        setActiveTextBox(null);
     };
 
     return (
@@ -284,7 +274,7 @@ export function PdfEditor() {
                     <div className="space-y-6">
                         <Card className="p-4 bg-muted/50">
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button onClick={() => setEditorMode('addText')} variant={editorMode === 'addText' ? 'secondary' : 'outline'}>
+                                <Button onClick={() => { setEditorMode('addText'); setActiveTextBox(null); }} variant={editorMode === 'addText' ? 'secondary' : 'outline'}>
                                     <Type className="mr-2 h-4 w-4" />
                                     Add Text
                                 </Button>
@@ -303,12 +293,37 @@ export function PdfEditor() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {pageImageUrls.map((url, index) => (
                                 <div 
-                                    key={index} 
+                                    key={url} // Using URL as key to force re-render on change
                                     ref={el => pageContainerRefs.current[index] = el}
-                                    className={`relative group border rounded-md overflow-hidden aspect-[7/9] bg-white ${editorMode === 'addText' ? 'cursor-text' : ''}`}
+                                    className={`relative group border rounded-md overflow-hidden aspect-[7/9] bg-white ${editorMode === 'addText' && !activeTextBox ? 'cursor-text' : ''}`}
                                     onClick={(e) => handlePageClick(e, index)}
                                 >
                                     <img src={url} alt={`Page ${index + 1}`} className="w-full h-full object-contain" />
+                                    
+                                    {activeTextBox && activeTextBox.pageIndex === index && (
+                                        <div 
+                                            className="absolute p-1 bg-background/80 backdrop-blur-sm border border-primary rounded-lg shadow-lg"
+                                            style={{ left: `${activeTextBox.x}px`, top: `${activeTextBox.y}px` }}
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <Textarea
+                                                placeholder="Type here..."
+                                                value={activeTextBox.value}
+                                                onChange={(e) => setActiveTextBox(prev => prev ? {...prev, value: e.target.value} : null)}
+                                                className="w-48 h-24 text-sm"
+                                                autoFocus
+                                            />
+                                            <div className="flex justify-end gap-1 mt-1">
+                                                <Button size="icon" variant="ghost" className="h-7 w-7 text-red-500 hover:bg-red-100" onClick={() => setActiveTextBox(null)}>
+                                                    <XCircle className="h-5 w-5" />
+                                                </Button>
+                                                <Button size="icon" variant="ghost" className="h-7 w-7 text-green-500 hover:bg-green-100" onClick={handleSaveText}>
+                                                    <CheckCircle className="h-5 w-5" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                         <Button variant="destructive" size="icon" onClick={(e) => { e.stopPropagation(); handleDeletePage(index); }}>
                                             <Trash2 className="h-4 w-4" />
@@ -333,32 +348,6 @@ export function PdfEditor() {
                         </Button>
                     </div>
                 )}
-                 <AlertDialog open={textDialogState.isOpen} onOpenChange={(isOpen) => !isOpen && setTextDialogState({ isOpen: false, pageIndex: null, x: null, y: null })}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                        <AlertDialogTitle>Add Text</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Enter the text you want to add to the page.
-                        </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="text-to-add" className="text-right">Text</Label>
-                                <Input
-                                    id="text-to-add"
-                                    value={textToAdd}
-                                    onChange={(e) => setTextToAdd(e.target.value)}
-                                    className="col-span-3"
-                                    autoFocus
-                                />
-                            </div>
-                        </div>
-                        <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setTextDialogState({ isOpen: false, pageIndex: null, x: null, y: null })}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleAddText}>Add Text</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
             </CardContent>
         </Card>
     );
