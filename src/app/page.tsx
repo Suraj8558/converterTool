@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Search, ArrowRight, ShieldCheck, Star, BadgePercent } from 'lucide-react';
 import { toolCategories } from '@/lib/tools';
+import { Badge } from '@/components/ui/badge';
 
 export default function Home() {
   return (
@@ -37,23 +38,42 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {category.tools.map((tool) => (
-                <Link href={tool.href} key={tool.name} className="block group rounded-xl p-0.5 transition-all duration-300 hover:bg-gradient-to-br from-primary to-tertiary">
+              {category.tools.map((tool) => {
+                const isComingSoon = tool.href === '#';
+                
+                const cardInner = (
                   <Card className="h-full rounded-lg flex flex-col bg-card border-0">
                     <CardHeader>
-                      <CardTitle className="text-lg font-headline">{tool.name}</CardTitle>
+                      <div className="flex justify-between items-start">
+                        <CardTitle className="text-lg font-headline pr-2">{tool.name}</CardTitle>
+                        {isComingSoon && <Badge variant="secondary">Coming Soon</Badge>}
+                      </div>
                     </CardHeader>
                     <CardContent className="flex-grow">
                       <p className="text-sm text-muted-foreground">{tool.description}</p>
                     </CardContent>
                     <CardFooter className="pt-4">
                       <div className="w-full flex justify-end">
-                        <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        {!isComingSoon && <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />}
                       </div>
                     </CardFooter>
                   </Card>
-                </Link>
-              ))}
+                );
+
+                if (isComingSoon) {
+                  return (
+                    <div key={tool.name} className="block rounded-xl p-0.5 opacity-60 cursor-not-allowed">
+                      {cardInner}
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link href={tool.href} key={tool.name} className="block group rounded-xl p-0.5 transition-all duration-300 hover:bg-gradient-to-br from-primary to-tertiary">
+                    {cardInner}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         ))}

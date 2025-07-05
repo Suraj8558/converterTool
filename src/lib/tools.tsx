@@ -28,8 +28,8 @@ export const toolCategories: ToolCategory[] = [
       { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your desired dimensions.' },
       { name: 'Image Compressor', href: '/image-compressor', description: 'Reduce image file sizes with adjustable quality.' },
       { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create standards-compliant passport photos.' },
-      { name: 'Background Remover', href: '/background-remover', description: 'Automatically remove image backgrounds using AI.' },
-      { name: 'GIF to MP4', href: '/gif-to-mp4', description: 'Convert animated GIF to MP4 video.' },
+      { name: 'Background Remover', href: '#', description: 'Automatically remove image backgrounds using AI.' },
+      { name: 'GIF to MP4', href: '#', description: 'Convert animated GIF to MP4 video.' },
     ],
   },
   {
@@ -37,9 +37,9 @@ export const toolCategories: ToolCategory[] = [
     icon: <File className="h-10 w-10 text-primary" />,
     description: 'Convert various file formats for documents, audio, and video.',
     tools: [
-      { name: 'MP4 to AVI', href: '/mp4-to-avi', description: 'Convert MP4 video to AVI format.' },
-      { name: 'MP3 to WAV', href: '/mp3-to-wav', description: 'Convert MP3 audio to WAV format.' },
-      { name: 'DOC to PDF', href: '/doc-to-pdf', description: 'Convert Word documents to PDF.' },
+      { name: 'MP4 to AVI', href: '#', description: 'Convert MP4 video to AVI format.' },
+      { name: 'MP3 to WAV', href: '#', description: 'Convert MP3 audio to WAV format.' },
+      { name: 'DOC to PDF', href: '#', description: 'Convert Word documents to PDF.' },
       { name: 'EPUB to MOBI', href: '#', description: 'Convert e-book formats.' },
     ],
   },
