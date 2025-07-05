@@ -43,12 +43,12 @@ const prompt = ai.definePrompt({
 
   Instructions:
   1. Generate a realistic-looking but entirely simulated backlink profile for the domain.
-  2. Create a plausible "domainAuthority" score between 1 and 100.
-  3. Generate a plausible "totalBacklinks" count and a "referringDomains" count.
+  2. Create a plausible "domainAuthority" score between 1 and 100. This must be a JSON number.
+  3. Generate a plausible "totalBacklinks" count and a "referringDomains" count. These must be JSON numbers, do not use commas or other formatting.
   4. Generate a list of exactly 10 simulated backlinks.
-  5. For each backlink, provide a realistic-looking source URL (which must be a full URL starting with https://), anchor text, and the referring domain's authority score.
+  5. For each backlink, provide a realistic-looking source URL (which must be a full URL string starting with https://), anchor text string, and the referring domain's authority score (as a JSON number).
   6. The data must be plausible but entirely simulated. Do not perform a real web search.
-  7. Respond in JSON format. Do not add any extra text or explanations.
+  7. Respond ONLY with a valid JSON object that conforms to the specified output format. Do not add any extra text, explanations, or markdown formatting like \`\`\`json.
 
   Output:`,
 });
