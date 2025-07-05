@@ -37,10 +37,10 @@ export const toolCategories: ToolCategory[] = [
     icon: <File className="h-10 w-10 text-primary" />,
     description: 'Convert various file formats for documents, audio, and video.',
     tools: [
-      { name: 'MP4 to AVI', href: '#', description: 'Convert MP4 video to AVI format.' },
-      { name: 'MP3 to WAV', href: '#', description: 'Convert MP3 audio to WAV format.' },
-      { name: 'DOC to PDF', href: '#', description: 'Convert Word documents to PDF.' },
-      { name: 'EPUB to MOBI', href: '#', description: 'Convert e-book formats.' },
+      { name: 'MP4 to AVI', href: '/mp4-to-avi', description: 'Convert MP4 video to AVI format.' },
+      { name: 'MP3 to WAV', href: '/mp3-to-wav', description: 'Convert MP3 audio to WAV format.' },
+      { name: 'DOC to PDF', href: '/doc-to-pdf', description: 'Convert Word documents to PDF.' },
+      { name: 'EPUB to MOBI', href: '/epub-to-mobi', description: 'Convert e-book formats.' },
     ],
   },
   {
@@ -48,10 +48,10 @@ export const toolCategories: ToolCategory[] = [
     icon: <FileText className="h-10 w-10 text-primary" />,
     description: 'A suite of tools to manage and manipulate PDF files.',
     tools: [
-      { name: 'PDF to Word', href: '#', description: 'Convert PDF files back to Word documents.' },
-      { name: 'Word to PDF', href: '#', description: 'Create PDF files from Word documents.' },
-      { name: 'PDF Merge', href: '#', description: 'Combine multiple PDF files into one.' },
-      { name: 'PDF Split', href: '#', description: 'Split a single PDF into multiple files.' },
+      { name: 'PDF to Word', href: '/pdf-to-word', description: 'Convert PDF files back to Word documents.' },
+      { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create PDF files from Word documents.' },
+      { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into one.' },
+      { name: 'PDF Split', href: '/pdf-split', description: 'Split a single PDF into multiple files.' },
     ],
   },
   {
@@ -61,8 +61,8 @@ export const toolCategories: ToolCategory[] = [
     tools: [
       { name: 'Meta Tag Generator', href: '/seo/meta-tag-generator', description: 'Generate SEO-friendly meta tags.' },
       { name: 'Keyword Research', href: '/seo/keyword-research', description: 'Find keywords for your content strategy.' },
-      { name: 'Plagiarism Checker', href: '#', description: 'Check for duplicate content.' },
-      { name: 'Backlink Checker', href: '#', description: 'Analyze your website\'s backlink profile.' },
+      { name: 'Plagiarism Checker', href: '/seo/plagiarism-checker', description: 'Check for duplicate content.' },
+      { name: 'Backlink Checker', href: '/seo/backlink-checker', description: 'Analyze your website\'s backlink profile.' },
     ],
   },
 ];
