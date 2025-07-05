@@ -101,7 +101,7 @@ export default function ContactPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full h-12 text-lg">
+                <Button type="submit" disabled={form.formState.isSubmitting} className="w-full h-12 text-lg text-primary-foreground bg-gradient-to-r from-primary to-tertiary hover:saturate-150 transition-all duration-300">
                   {form.formState.isSubmitting ? (
                     'Sending...'
                   ) : (

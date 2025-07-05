@@ -160,7 +160,7 @@ export function PassportPhotoMaker() {
 
             <div className="flex flex-col sm:flex-row gap-4">
                 {!processedImageUrl ? (
-                    <Button onClick={handleProcessImage} disabled={isProcessing} className="w-full">
+                    <Button onClick={handleProcessImage} disabled={isProcessing} className="w-full bg-gradient-to-r from-primary to-tertiary text-primary-foreground hover:saturate-150 transition-all duration-300">
                         {isProcessing ? 'Processing...' : 'Create Passport Photo'}
                     </Button>
                 ) : (

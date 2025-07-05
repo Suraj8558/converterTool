@@ -96,7 +96,7 @@ export function MetaTagGenerator() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isLoading} className="w-full h-12 text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
+              <Button type="submit" disabled={isLoading} className="w-full h-12 text-lg font-bold text-primary-foreground bg-gradient-to-r from-primary to-tertiary hover:saturate-150 transition-all duration-300">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -198,7 +198,7 @@ export function ImageResizer() {
             </Card>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button onClick={handleResize} disabled={isResizing || !width || !height} className="w-full sm:w-auto flex-1">
+              <Button onClick={handleResize} disabled={isResizing || !width || !height} className="w-full sm:w-auto flex-1 bg-gradient-to-r from-primary to-tertiary text-primary-foreground hover:saturate-150 transition-all duration-300">
                 <Ruler className="mr-2 h-4 w-4" />
                 {isResizing ? 'Resizing...' : 'Resize Image'}
               </Button>

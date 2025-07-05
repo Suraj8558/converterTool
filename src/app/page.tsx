@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <section className="text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 font-headline bg-gradient-to-r from-primary to-primary/70 text-transparent bg-clip-text">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 font-headline bg-gradient-to-r from-primary to-tertiary text-transparent bg-clip-text">
           All-in-One Converter & SEO Tools
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-4xl mx-auto mb-8">
@@ -38,8 +38,8 @@ export default function Home() {
             </div>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {category.tools.map((tool) => (
-                <Link href={tool.href} key={tool.name} className="block group">
-                  <Card className="h-full hover:shadow-lg transition-all duration-300 rounded-xl flex flex-col border hover:border-primary/60">
+                <Link href={tool.href} key={tool.name} className="block group rounded-xl p-0.5 transition-all duration-300 hover:bg-gradient-to-br from-primary to-tertiary">
+                  <Card className="h-full rounded-lg flex flex-col bg-card border-0">
                     <CardHeader>
                       <CardTitle className="text-lg font-headline">{tool.name}</CardTitle>
                     </CardHeader>

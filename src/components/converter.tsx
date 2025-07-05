@@ -259,7 +259,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
               <Button 
                 onClick={handleConvert} 
                 disabled={files.length === 0 || isConverting}
-                className="w-full h-12 text-lg font-bold transition-all duration-300 transform hover:scale-105"
+                className="w-full h-12 text-lg font-bold text-primary-foreground bg-gradient-to-r from-primary to-tertiary hover:saturate-150 transition-all duration-300"
               >
                   Convert to .{toType}
               </Button>
