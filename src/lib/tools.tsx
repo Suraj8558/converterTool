@@ -48,6 +48,7 @@ export const toolCategories: ToolCategory[] = [
     icon: <FileText className="h-10 w-10 text-primary" />,
     description: 'A suite of tools to manage and manipulate PDF files.',
     tools: [
+      { name: 'PDF Editor', href: '/pdf-editor', description: 'Add or remove pages from your PDF files directly in your browser.' },
       { name: 'PDF to Word', href: '/pdf-to-word', description: 'Turn your static PDF files into fully editable Microsoft Word documents with preserved formatting.' },
       { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create professional, secure PDF files from your Word documents in just a few clicks.' },
       { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into a single, organized document for easy management and sharing.' },
