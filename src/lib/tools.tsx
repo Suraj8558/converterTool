@@ -1,4 +1,4 @@
-import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, Audio, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search } from 'lucide-react';
+import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, AudioLines, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -41,7 +41,7 @@ export const toolCategories: ToolCategory[] = [
     description: 'Switch between various document, audio, and video formats.',
     tools: [
       { name: 'MP4 to AVI', href: '/mp4-to-avi', description: 'Convert MP4 videos to AVI format for legacy media players.', icon: <Video className="w-6 h-6"/> },
-      { name: 'MP3 to WAV', href: '/mp3-to-wav', description: 'Transform MP3s into uncompressed WAV for professional audio quality.', icon: <Audio className="w-6 h-6"/> },
+      { name: 'MP3 to WAV', href: '/mp3-to-wav', description: 'Transform MP3s into uncompressed WAV for professional audio quality.', icon: <AudioLines className="w-6 h-6"/> },
       { name: 'DOC to PDF', href: '/doc-to-pdf', description: 'Convert Word documents to PDF for universal sharing and printing.', icon: <FileText className="w-6 h-6"/> },
       { name: 'EPUB to MOBI', href: '/epub-to-mobi', description: 'Convert EPUB e-books to MOBI format for your Kindle device.', icon: <Book className="w-6 h-6"/> },
     ],
@@ -55,7 +55,7 @@ export const toolCategories: ToolCategory[] = [
       { name: 'PDF to Word', href: '/pdf-to-word', description: 'Turn static PDFs into fully editable Microsoft Word documents.', icon: <ArrowRightLeft className="w-6 h-6"/> },
       { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create professional, secure PDF files from your Word documents.', icon: <ArrowRightLeft className="w-6 h-6"/> },
       { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into one single, organized document.', icon: <Merge className="w-6 h-6"/> },
-      { name: 'PDF Split', href: '/pdf-split', description: 'Extract pages or split a large PDF into multiple smaller files.', icon: <Split className="w-6 h-6"/> },
+      { name: 'PDF Split', href: '/pdf-split', description: 'Extract pages or a large PDF into multiple smaller files.', icon: <Split className="w-6 h-6"/> },
     ],
   },
 ];
