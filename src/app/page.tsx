@@ -33,10 +33,10 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8 md:py-16">
       <section className="text-center">
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 font-headline bg-gradient-to-r from-primary to-tertiary text-transparent bg-clip-text">
-          All-in-One Converter & SEO Tools
+          Your Digital Toolkit, Perfected.
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-4xl mx-auto mb-8">
-          Your complete suite of tools to convert files, manage PDFs, and boost your website's SEO.
+          The ultimate suite of tools for file conversion, PDF management, and image optimization. Fast, free, and designed for you.
         </p>
         <div className="max-w-xl mx-auto">
           <div className="relative">
@@ -44,7 +44,7 @@ export default function Home() {
             <Input
               type="search"
               placeholder="Search for a tool (e.g., 'PNG to JPG')"
-              className="w-full pl-12 h-12 text-lg rounded-full shadow-sm"
+              className="w-full pl-12 h-12 text-lg rounded-full shadow-lg focus:shadow-primary/20 transition-shadow"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -65,20 +65,19 @@ export default function Home() {
               </div>
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {category.tools.map((tool) => (
-                  <Link href={tool.href} key={tool.name} className="block group rounded-xl p-0.5 transition-all duration-300 hover:bg-gradient-to-br from-primary to-tertiary">
-                     <Card className="h-full rounded-lg flex flex-col bg-card border-0">
-                      <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg font-headline pr-2">{tool.name}</CardTitle>
+                  <Link href={tool.href} key={tool.name} className="block group">
+                     <Card className="h-full rounded-xl flex flex-col bg-card border transition-all duration-300 hover:border-primary hover:shadow-lg hover:-translate-y-1">
+                      <CardHeader className="flex-row items-center gap-4 space-y-0">
+                         <div className="p-3 bg-muted rounded-lg text-primary">
+                          {tool.icon}
                         </div>
+                        <CardTitle className="text-lg font-headline">{tool.name}</CardTitle>
                       </CardHeader>
-                      <CardContent className="flex-grow">
+                      <CardContent className="flex-grow pt-0">
                         <p className="text-sm text-muted-foreground">{tool.description}</p>
                       </CardContent>
-                      <CardFooter className="pt-4">
-                        <div className="w-full flex justify-end">
-                          <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                        </div>
+                      <CardFooter className="pt-4 justify-end">
+                        <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                       </CardFooter>
                     </Card>
                   </Link>
@@ -100,25 +99,25 @@ export default function Home() {
         <p className="text-muted-foreground max-w-2xl mx-auto mb-12">We provide reliable, fast, and secure tools to make your digital life easier.</p>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center p-4 flex flex-col items-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted text-primary mb-4">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
                     <ShieldCheck className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 font-headline">Secure & Private</h3>
-                <p className="text-muted-foreground">Your files are your own. We automatically delete them from our servers after a few hours.</p>
+                <p className="text-muted-foreground">Your privacy is paramount. Files are processed in your browser or deleted from servers within hours.</p>
             </div>
             <div className="text-center p-4 flex flex-col items-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted text-primary mb-4">
+                 <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
                     <Star className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2 font-headline">High Quality Conversions</h3>
-                <p className="text-muted-foreground">Our tools preserve the quality of your files, so you get the best results every time.</p>
+                <h3 className="text-xl font-semibold mb-2 font-headline">High-Quality Results</h3>
+                <p className="text-muted-foreground">Our tools are designed to preserve the quality of your files, ensuring you get the best output every time.</p>
             </div>
             <div className="text-center p-4 flex flex-col items-center">
-                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted text-primary mb-4">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">
                     <BadgePercent className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 font-headline">Completely Free</h3>
-                <p className="text-muted-foreground">All our tools are free to use, with no hidden costs or subscriptions required.</p>
+                <p className="text-muted-foreground">All our tools are free to use. No hidden fees, no subscriptions, just powerful tools at your fingertips.</p>
             </div>
         </div>
       </section>

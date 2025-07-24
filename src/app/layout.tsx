@@ -5,11 +5,23 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
 import { cn } from '@/lib/utils';
+import { Inter, Lexend } from 'next/font/google';
 
 export const metadata: Metadata = {
-  title: 'ConvertIQ - All-in-One Converter & SEO Tools',
-  description: 'Easily convert files, optimize your website, and manage PDF tasks with our all-in-one platform.',
+  title: 'ConvertIQ - All-in-One Converter & Productivity Tools',
+  description: 'Easily convert files, edit PDFs, and optimize images with our all-in-one platform.',
 };
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+})
+
+const lexend = Lexend({
+  subsets: ['latin'],
+  variable: '--font-lexend',
+})
+
 
 export default function RootLayout({
   children,
@@ -18,12 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className={cn('font-body antialiased')}>
+      <body className={cn('font-body antialiased', inter.variable, lexend.variable)}>
         <ThemeProvider
             attribute="class"
             defaultTheme="system"

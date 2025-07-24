@@ -1,10 +1,11 @@
-import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2 } from 'lucide-react';
+import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, Audio, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
   name: string;
   href: string;
   description: string;
+  icon: ReactNode;
 };
 
 type ToolCategory = {
@@ -17,44 +18,44 @@ type ToolCategory = {
 export const toolCategories: ToolCategory[] = [
   {
     name: 'Image Tools',
-    icon: <ImageIcon className="h-10 w-10 text-primary" />,
-    description: 'Tools to convert, edit, and manipulate images.',
+    icon: <ImageIcon className="h-8 w-8 text-primary" />,
+    description: 'Convert, edit, and manipulate your images with ease.',
     tools: [
-      { name: 'JPG to PNG', href: '/jpg-to-png', description: 'Easily convert your JPG images to high-quality PNG format, which supports transparency.' },
-      { name: 'PNG to JPG', href: '/png-to-jpg', description: 'Quickly convert your PNG images to the universally compatible JPG format, perfect for web use.' },
-      { name: 'SVG to PNG', href: '/svg-to-png', description: 'Convert your scalable SVG vector files into high-quality PNG images with transparent backgrounds.' },
-      { name: 'PNG to SVG', href: '/png-to-svg', description: 'Convert your PNG images into scalable SVG vector graphics using AI-powered tracing.' },
-      { name: 'WebP to JPG', href: '/webp-to-jpg', description: 'Convert modern WebP images to the standard JPG format for wider compatibility across devices.' },
-      { name: 'JPG to AVIF', href: '/jpg-to-avif', description: 'Transform your JPG images into the next-generation AVIF format for superior compression and quality.' },
-      { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert your PNG images to high-quality, efficient AVIF files, ideal for modern web applications.' },
-      { name: 'Image Resizer', href: '/image-resizer', description: 'Resize your JPG, PNG, WebP, or GIF images to any dimensions you need without losing quality.' },
-      { name: 'Image Compressor', href: '/image-compressor', description: 'Drastically reduce the file size of your JPG, PNG, and WebP images with our smart compression tool.' },
-      { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create official passport, visa, or ID photos from your own pictures, formatted to the correct size.' },
-      { name: 'Background Remover', href: '/background-remover', description: 'Automatically erase the background from any photo with a single click using advanced AI technology.' },
-      { name: 'GIF to MP4', href: '/gif-to-mp4', description: 'Convert animated GIF files into lightweight, high-quality MP4 videos that are easy to share.' },
+      { name: 'JPG to PNG', href: '/jpg-to-png', description: 'Convert JPG images to PNG with transparency support.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'PNG to JPG', href: '/png-to-jpg', description: 'Convert PNG images to the universally compatible JPG format.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'SVG to PNG', href: '/svg-to-png', description: 'Convert scalable SVG vectors into high-quality PNG images.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'PNG to SVG', href: '/png-to-svg', description: 'Convert PNG images into scalable SVG vector graphics.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'WebP to JPG', href: '/webp-to-jpg', description: 'Convert modern WebP images to standard JPG format.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'JPG to AVIF', href: '/jpg-to-avif', description: 'Transform JPGs to the next-gen AVIF format for superior quality.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert PNGs to high-quality, efficient AVIF files.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your exact dimensions without losing quality.', icon: <Scissors className="w-6 h-6"/> },
+      { name: 'Image Compressor', href: '/image-compressor', description: 'Reduce image file sizes with smart, adjustable compression.', icon: <Shrink className="w-6 h-6"/> },
+      { name: 'Passport Photo Maker', href: '/passport-photo-maker', description: 'Create official passport, visa, or ID photos from your pictures.', icon: <UserSquare className="w-6 h-6"/> },
+      { name: 'Background Remover', href: '/background-remover', description: 'Automatically erase image backgrounds with a single click using AI.', icon: <Wand2 className="w-6 h-6"/> },
+      { name: 'GIF to MP4', href: '/gif-to-mp4', description: 'Convert animated GIFs into lightweight, high-quality MP4 videos.', icon: <Video className="w-6 h-6"/> },
     ],
   },
   {
     name: 'File Converters',
-    icon: <File className="h-10 w-10 text-primary" />,
-    description: 'Convert various file formats for documents, audio, and video.',
+    icon: <File className="h-8 w-8 text-primary" />,
+    description: 'Switch between various document, audio, and video formats.',
     tools: [
-      { name: 'MP4 to AVI', href: '/mp4-to-avi', description: 'Convert your MP4 video files to the classic AVI format for compatibility with various media players.' },
-      { name: 'MP3 to WAV', href: '/mp3-to-wav', description: 'Transform your MP3 audio files into uncompressed WAV format for professional-quality sound.' },
-      { name: 'DOC to PDF', href: '/doc-to-pdf', description: 'Convert Microsoft Word documents (DOC, DOCX) to PDF format for easy sharing and printing.' },
-      { name: 'EPUB to MOBI', href: '/epub-to-mobi', description: 'Convert your EPUB e-books to the MOBI format, perfect for reading on your Kindle device.' },
+      { name: 'MP4 to AVI', href: '/mp4-to-avi', description: 'Convert MP4 videos to AVI format for legacy media players.', icon: <Video className="w-6 h-6"/> },
+      { name: 'MP3 to WAV', href: '/mp3-to-wav', description: 'Transform MP3s into uncompressed WAV for professional audio quality.', icon: <Audio className="w-6 h-6"/> },
+      { name: 'DOC to PDF', href: '/doc-to-pdf', description: 'Convert Word documents to PDF for universal sharing and printing.', icon: <FileText className="w-6 h-6"/> },
+      { name: 'EPUB to MOBI', href: '/epub-to-mobi', description: 'Convert EPUB e-books to MOBI format for your Kindle device.', icon: <Book className="w-6 h-6"/> },
     ],
   },
   {
     name: 'PDF Tools',
-    icon: <FileText className="h-10 w-10 text-primary" />,
-    description: 'A suite of tools to manage and manipulate PDF files.',
+    icon: <FileText className="h-8 w-8 text-primary" />,
+    description: 'A complete suite of tools to manage and manipulate PDFs.',
     tools: [
-      { name: 'PDF Editor', href: '/pdf-editor', description: 'Add or remove pages from your PDF files directly in your browser.' },
-      { name: 'PDF to Word', href: '/pdf-to-word', description: 'Turn your static PDF files into fully editable Microsoft Word documents with preserved formatting.' },
-      { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create professional, secure PDF files from your Word documents in just a few clicks.' },
-      { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into a single, organized document for easy management and sharing.' },
-      { name: 'PDF Split', href: '/pdf-split', description: 'Extract specific pages or split a large PDF into multiple smaller files by page range or size.' },
+      { name: 'PDF Editor', href: '/pdf-editor', description: 'Add text and pages to your PDF files directly in your browser.', icon: <Edit className="w-6 h-6"/> },
+      { name: 'PDF to Word', href: '/pdf-to-word', description: 'Turn static PDFs into fully editable Microsoft Word documents.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create professional, secure PDF files from your Word documents.', icon: <ArrowRightLeft className="w-6 h-6"/> },
+      { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into one single, organized document.', icon: <Merge className="w-6 h-6"/> },
+      { name: 'PDF Split', href: '/pdf-split', description: 'Extract pages or split a large PDF into multiple smaller files.', icon: <Split className="w-6 h-6"/> },
     ],
   },
 ];
