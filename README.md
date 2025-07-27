@@ -7,7 +7,8 @@ ConvertIQ is a comprehensive, open-source web application built with Next.js and
 - **Image Tools**: Convert between formats (JPG, PNG, SVG, AVIF, WebP), resize, compress, remove backgrounds, and create passport photos.
 - **File Converters**: Switch between various document, audio, and video formats.
 - **PDF Toolkit**: Edit, merge, split, and convert PDF documents with ease.
-- **AI-Powered**: Utilizes generative AI to power features like background removal.
+- **SEO Tools**: Analyze websites with a backlink checker, keyword research tool, and plagiarism detector.
+- **AI-Powered**: Utilizes generative AI to power features like background removal and SEO analysis.
 - **Client-Side Processing**: Most file manipulations happen directly in your browser, ensuring your data remains private and secure.
 - **Modern UI/UX**: A clean, responsive, and intuitive interface built with ShadCN UI, Tailwind CSS, and Lucide Icons. Includes dark mode support.
 - **Searchable**: Quickly find the exact tool you need with a powerful on-site search.
