@@ -1,6 +1,6 @@
 import { Portfolio } from '@/components/portfolio';
 import type { Metadata } from 'next';
-import './portfolio.css';
+import '../portfolio.css';
 
 export const metadata: Metadata = {
   title: 'Suraj Kumar - Portfolio',
