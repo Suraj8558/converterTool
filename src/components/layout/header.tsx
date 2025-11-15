@@ -61,7 +61,7 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu */}
-        <div className="flex-1 items-center md:hidden flex">
+        <div className="flex w-full items-center md:hidden">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
