@@ -2,7 +2,7 @@ import { MetaTagGenerator } from '@/components/meta-tag-generator';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Meta Tag Generator - ConvertIQ',
+  title: 'AI Meta Tag Generator - devSuraj',
   description: 'Generate SEO-friendly meta titles, descriptions, and keywords for your website using AI.',
 };
 

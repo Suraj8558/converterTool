@@ -2,7 +2,7 @@ import { KeywordResearchTool } from '@/components/keyword-research';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Keyword Research Tool - ConvertIQ',
+  title: 'AI Keyword Research Tool - devSuraj',
   description: 'Discover keyword ideas, search volume, and difficulty with our AI-powered tool.',
 };
 

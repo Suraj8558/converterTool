@@ -4,7 +4,7 @@ import { Terminal } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'EPUB to MOBI Converter - ConvertIQ',
+  title: 'EPUB to MOBI Converter - devSuraj',
   description: 'Convert EPUB e-books to MOBI format for your Kindle device.',
 };
 

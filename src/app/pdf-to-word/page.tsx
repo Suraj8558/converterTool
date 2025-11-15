@@ -4,7 +4,7 @@ import { Terminal } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF to Word Converter - ConvertIQ',
+  title: 'PDF to Word Converter - devSuraj',
   description: 'Convert PDF files to editable Microsoft Word documents.',
 };
 

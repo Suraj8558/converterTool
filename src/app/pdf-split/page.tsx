@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF Split - ConvertIQ',
+  title: 'PDF Split - devSuraj',
   description: 'Split a single PDF into multiple files by page ranges.',
 };
 

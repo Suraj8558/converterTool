@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - ConvertIQ',
-  description: 'Read the Terms of Service for using ConvertIQ tools.',
+  title: 'Terms of Service - devSuraj',
+  description: 'Read the Terms of Service for using devSuraj tools.',
 };
 
 export default function TermsPage() {
@@ -17,7 +17,7 @@ export default function TermsPage() {
         <CardContent className="space-y-6 text-muted-foreground">
           <p>Last updated: July 29, 2024</p>
           
-          <p>Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the ConvertIQ website (the "Service") operated by us.</p>
+          <p>Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the devSuraj website (the "Service") operated by us.</p>
           
           <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users, and others who access or use the Service. By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.</p>
 
@@ -44,17 +44,17 @@ export default function TermsPage() {
 
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">4. Intellectual Property</h2>
-              <p>The Service and its original content (excluding content provided by users), features, and functionality are and will remain the exclusive property of ConvertIQ and its licensors. Our trademarks may not be used in connection with any product or service without our prior written consent.</p>
+              <p>The Service and its original content (excluding content provided by users), features, and functionality are and will remain the exclusive property of devSuraj and its licensors. Our trademarks may not be used in connection with any product or service without our prior written consent.</p>
           </div>
 
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">5. Disclaimer of Warranties</h2>
-              <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. ConvertIQ makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights. We do not warrant that the service will be uninterrupted, secure, or error-free.</p>
+              <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. devSuraj makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights. We do not warrant that the service will be uninterrupted, secure, or error-free.</p>
           </div>
 
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">6. Limitation of Liability</h2>
-              <p>In no event shall ConvertIQ or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website, even if we have been notified orally or in writing of the possibility of such damage.</p>
+              <p>In no event shall devSuraj or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website, even if we have been notified orally or in writing of the possibility of such damage.</p>
           </div>
           
           <div>

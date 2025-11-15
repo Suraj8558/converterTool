@@ -2,7 +2,7 @@ import { PlagiarismChecker } from '@/components/plagiarism-checker';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Plagiarism Checker - ConvertIQ',
+  title: 'AI Plagiarism Checker - devSuraj',
   description: 'Check your text for uniqueness and find potential plagiarism with our AI-powered tool.',
 };
 

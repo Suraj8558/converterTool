@@ -5,7 +5,7 @@ import { Terminal, UploadCloud, FileText } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF Merge - ConvertIQ',
+  title: 'PDF Merge - devSuraj',
   description: 'Combine multiple PDF files into one single document.',
 };
 

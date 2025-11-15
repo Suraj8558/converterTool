@@ -4,7 +4,7 @@ import { Terminal } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PNG to SVG Converter - ConvertIQ',
+  title: 'PNG to SVG Converter - devSuraj',
   description: 'Convert PNG images to scalable vector graphics (SVG) online.',
 };
 

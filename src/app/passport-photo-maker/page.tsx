@@ -2,7 +2,7 @@ import { PassportPhotoMaker } from '@/components/passport-photo-maker';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Passport Size Photo Maker - ConvertIQ',
+  title: 'Passport Size Photo Maker - devSuraj',
   description: 'Easily create passport size photos from your own pictures for free.',
 };
 

@@ -5,7 +5,7 @@ import { Terminal } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'GIF to MP4 Converter - ConvertIQ',
+  title: 'GIF to MP4 Converter - devSuraj',
   description: 'Convert animated GIF files to MP4 videos online for free.',
 };
 

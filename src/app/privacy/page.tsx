@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - ConvertIQ',
-  description: 'Read the Privacy Policy for using ConvertIQ tools.',
+  title: 'Privacy Policy - devSuraj',
+  description: 'Read the Privacy Policy for using devSuraj tools.',
 };
 
 export default function PrivacyPage() {

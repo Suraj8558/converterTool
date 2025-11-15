@@ -95,7 +95,7 @@ export default function Home() {
       </section>
 
       <section className="mt-16 md:mt-24 text-center bg-card py-16 rounded-2xl shadow-sm border">
-        <h2 className="text-3xl font-bold mb-4 font-headline">Why Choose ConvertIQ?</h2>
+        <h2 className="text-3xl font-bold mb-4 font-headline">Why Choose devSuraj?</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto mb-12">We provide reliable, fast, and secure tools to make your digital life easier.</p>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center p-4 flex flex-col items-center">

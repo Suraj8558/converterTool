@@ -46,8 +46,8 @@ export default function ContactPage() {
   return (
     <>
       <head>
-        <title>Contact Us - ConvertIQ</title>
-        <meta name="description" content="Get in touch with the ConvertIQ team." />
+        <title>Contact Us - devSuraj</title>
+        <meta name="description" content="Get in touch with the devSuraj team." />
       </head>
       <div className="container mx-auto max-w-2xl py-12">
         <Card>

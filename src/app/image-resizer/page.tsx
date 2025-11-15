@@ -2,7 +2,7 @@ import { ImageResizer } from '@/components/image-resizer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Image Resizer - ConvertIQ',
+  title: 'Image Resizer - devSuraj',
   description: 'Resize your JPG, PNG, WebP, or GIF images to any dimensions you need.',
 };
 

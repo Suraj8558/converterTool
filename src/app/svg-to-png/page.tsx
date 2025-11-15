@@ -2,7 +2,7 @@ import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'SVG to PNG Converter - ConvertIQ',
+  title: 'SVG to PNG Converter - devSuraj',
   description: 'Easily convert your scalable vector graphics (SVG) to high-quality PNG images.',
 };
 

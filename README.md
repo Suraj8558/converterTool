@@ -1,6 +1,6 @@
-# ConvertIQ - All-in-One File Converter & SEO Toolkit
+# devSuraj - All-in-One File Converter & SEO Toolkit
 
-ConvertIQ is a comprehensive, open-source web application built with Next.js and Firebase that provides a powerful suite of tools for file conversion, image manipulation, and PDF management. It's designed to be fast, secure, and user-friendly, with most processing handled client-side for maximum privacy.
+devSuraj is a comprehensive, open-source web application built with Next.js and Firebase that provides a powerful suite of tools for file conversion, image manipulation, and PDF management. It's designed to be fast, secure, and user-friendly, with most processing handled client-side for maximum privacy.
 
 ## ✨ Features
 

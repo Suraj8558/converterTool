@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { Inter, Lexend } from 'next/font/google';
 
 export const metadata: Metadata = {
-  title: 'ConvertIQ - All-in-One Converter & Productivity Tools',
+  title: 'devSuraj - All-in-One Converter & Productivity Tools',
   description: 'Easily convert files, edit PDFs, and optimize images with our all-in-one platform.',
 };
 

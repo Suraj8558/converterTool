@@ -2,7 +2,7 @@ import { BackgroundRemover } from '@/components/background-remover';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Image Background Remover - ConvertIQ',
+  title: 'AI Image Background Remover - devSuraj',
   description: 'Easily remove the background from any image with a single click using AI.',
 };
 

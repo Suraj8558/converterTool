@@ -2,7 +2,7 @@ import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'DOC to PDF Converter - ConvertIQ',
+  title: 'DOC to PDF Converter - devSuraj',
   description: 'Convert Microsoft Word documents (DOC, DOCX) to PDF format for free.',
 };
 

@@ -27,13 +27,12 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 flex h-14 items-center">
-        {/* Desktop Menu */}
+      <div className="container mx-auto flex h-14 items-center px-4">
         <div className="mr-4 hidden flex-1 items-center md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <SheetIcon className="h-6 w-6 text-primary" />
             <span className="font-bold sm:inline-block font-headline">
-              ConvertIQ
+              devSuraj
             </span>
           </Link>
           <NavigationMenu>
@@ -60,7 +59,6 @@ export default function Header() {
           </NavigationMenu>
         </div>
 
-        {/* Mobile Menu */}
         <div className="flex flex-1 items-center justify-between md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -72,7 +70,7 @@ export default function Header() {
               <SheetContent side="left" className="w-full max-w-sm p-0 flex flex-col">
                 <Link href="/" className="flex items-center space-x-2 p-4 border-b" onClick={() => setOpen(false)}>
                   <SheetIcon className="h-6 w-6 text-primary" />
-                  <span className="font-bold font-headline">ConvertIQ</span>
+                  <span className="font-bold font-headline">devSuraj</span>
                 </Link>
                 <ScrollArea className="flex-1">
                   <div className="flex flex-col space-y-2 p-4">
@@ -100,7 +98,7 @@ export default function Header() {
             
             <Link href="/" className="flex items-center space-x-2">
                 <SheetIcon className="h-6 w-6 text-primary" />
-                <span className="font-bold font-headline">ConvertIQ</span>
+                <span className="font-bold font-headline">devSuraj</span>
             </Link>
         </div>
         

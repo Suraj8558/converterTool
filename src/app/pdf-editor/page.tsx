@@ -2,7 +2,7 @@ import { PdfEditor } from '@/components/pdf-editor';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF Editor - ConvertIQ',
+  title: 'PDF Editor - devSuraj',
   description: 'Edit pages in your PDF files online for free. Add and remove pages from your document.',
 };
 

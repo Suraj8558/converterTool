@@ -2,7 +2,7 @@ import { BacklinkChecker } from '@/components/backlink-checker';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AI Backlink Checker - ConvertIQ',
+  title: 'AI Backlink Checker - devSuraj',
   description: 'Analyze the backlink profile of any domain with our AI-powered tool.',
 };
 

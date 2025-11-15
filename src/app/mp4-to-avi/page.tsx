@@ -2,7 +2,7 @@ import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'MP4 to AVI Converter - ConvertIQ',
+  title: 'MP4 to AVI Converter - devSuraj',
   description: 'Easily convert your MP4 video files to AVI format online for free.',
 };
 
