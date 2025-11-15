@@ -1,4 +1,4 @@
-import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, AudioLines, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search, Briefcase } from 'lucide-react';
+import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, AudioLines, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -59,11 +59,14 @@ export const toolCategories: ToolCategory[] = [
     ],
   },
     {
-    name: 'Portfolio',
-    icon: <Briefcase className="h-8 w-8 text-primary" />,
-    description: 'View the portfolio of the developer.',
+    name: 'SEO Tools',
+    icon: <Compass className="h-8 w-8 text-primary" />,
+    description: 'Analyze and optimize your website for search engines.',
     tools: [
-        { name: 'Developer Portfolio', href: '/portfolio', description: 'Check out the skills, projects, and experience of the creator.', icon: <UserSquare className="w-6 h-6"/> },
+        { name: 'Backlink Checker', href: '/seo/backlink-checker', description: 'Analyze the backlink profile of any domain.', icon: <FileKey className="w-6 h-6"/> },
+        { name: 'Keyword Research', href: '/seo/keyword-research', description: 'Discover keyword ideas and search volume.', icon: <Search className="w-6 h-6"/> },
+        { name: 'Meta Tag Generator', href: '/seo/meta-tag-generator', description: 'Generate SEO-friendly titles and descriptions.', icon: <Text className="w-6 h-6"/> },
+        { name: 'Plagiarism Checker', href: '/seo/plagiarism-checker', description: 'Check your content for uniqueness.', icon: <FileText className="w-6 h-6"/> },
     ],
   },
 ];
