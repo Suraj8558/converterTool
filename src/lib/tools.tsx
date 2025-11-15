@@ -1,4 +1,4 @@
-import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, AudioLines, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search } from 'lucide-react';
+import { ImageIcon, File, FileText, Scissors, UserSquare, Shrink, Wand2, Image, FileType, Video, AudioLines, Book, Trash, Split, Merge, Edit, Text, ArrowRightLeft, FileKey, Compass, Search, Briefcase } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -56,6 +56,14 @@ export const toolCategories: ToolCategory[] = [
       { name: 'Word to PDF', href: '/word-to-pdf', description: 'Create professional, secure PDF files from your Word documents.', icon: <ArrowRightLeft className="w-6 h-6"/> },
       { name: 'PDF Merge', href: '/pdf-merge', description: 'Combine multiple PDF files into one single, organized document.', icon: <Merge className="w-6 h-6"/> },
       { name: 'PDF Split', href: '/pdf-split', description: 'Extract pages or a large PDF into multiple smaller files.', icon: <Split className="w-6 h-6"/> },
+    ],
+  },
+    {
+    name: 'Portfolio',
+    icon: <Briefcase className="h-8 w-8 text-primary" />,
+    description: 'View the portfolio of the developer.',
+    tools: [
+        { name: 'Developer Portfolio', href: '/portfolio', description: 'Check out the skills, projects, and experience of the creator.', icon: <UserSquare className="w-6 h-6"/> },
     ],
   },
 ];

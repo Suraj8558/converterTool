@@ -1,0 +1,43 @@
+
+.portfolio-body {
+  @apply bg-background text-foreground;
+}
+
+.section-title {
+  @apply text-4xl md:text-5xl font-bold font-headline mb-4;
+}
+
+.section-subtitle {
+  @apply text-lg text-muted-foreground max-w-3xl mx-auto;
+}
+
+.skill-badge {
+    @apply bg-muted text-muted-foreground px-4 py-2 rounded-lg text-sm font-medium border border-transparent transition-all hover:bg-primary/10 hover:text-primary hover:border-primary;
+}
+
+.project-card {
+    @apply rounded-xl border bg-card text-card-foreground shadow-sm transition-all duration-300 hover:shadow-lg hover:border-primary hover:-translate-y-1;
+}
+
+.social-icon {
+    @apply h-8 w-8 text-muted-foreground transition-colors hover:text-primary;
+}
+
+.wave {
+  animation-name: wave-animation;
+  animation-duration: 2.5s;
+  animation-iteration-count: infinite;
+  transform-origin: 70% 70%;
+  display: inline-block;
+}
+
+@keyframes wave-animation {
+    0% { transform: rotate( 0.0deg) }
+   10% { transform: rotate(14.0deg) }
+   20% { transform: rotate(-8.0deg) }
+   30% { transform: rotate(14.0deg) }
+   40% { transform: rotate(-4.0deg) }
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
