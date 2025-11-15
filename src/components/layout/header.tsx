@@ -61,7 +61,7 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu */}
-        <div className="flex w-full items-center justify-between md:hidden">
+        <div className="flex flex-1 items-center justify-between md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -103,7 +103,9 @@ export default function Header() {
                 <span className="font-bold font-headline">ConvertIQ</span>
             </Link>
 
-            <ThemeToggle />
+            <div className="flex items-center justify-end space-x-2">
+              <ThemeToggle />
+            </div>
         </div>
         
         <div className="hidden items-center justify-end space-x-2 md:flex md:flex-1">
