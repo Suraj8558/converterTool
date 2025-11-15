@@ -67,7 +67,7 @@ export function Portfolio() {
 
           <div className="relative mb-8">
              <Image
-              src="https://devsuraj.in/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FAvatar.3b22312a.png&w=256&q=75"
+              src="https://placehold.co/180x180/7e5bef/white?text=SK"
               alt="Suraj Kumar"
               width={180}
               height={180}
@@ -91,7 +91,7 @@ export function Portfolio() {
                 </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="https://devsuraj.in/Suraj-Kumar-Resume.pdf" target="_blank">
+              <Link href="#" target="_blank">
                 Download CV <Download className="ml-2 h-5 w-5" />
               </Link>
             </Button>
