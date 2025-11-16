@@ -37,24 +37,31 @@ export default function Header() {
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
-              {toolCategories.map((category) => (
-                <NavigationMenuItem key={category.name}>
-                  <NavigationMenuTrigger>{category.name}</NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                      {category.tools.map((tool) => (
-                        <ListItem
-                          key={tool.name}
-                          title={tool.name}
-                          href={tool.href}
-                        >
-                          {tool.description}
-                        </ListItem>
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              ))}
+              {toolCategories.map((category) => {
+                  const isImageTools = category.name === 'Image Tools';
+                  const gridClasses = isImageTools
+                    ? 'md:w-[600px] lg:w-[750px] md:grid-cols-3'
+                    : 'md:w-[500px] md:grid-cols-2 lg:w-[600px]';
+
+                  return (
+                    <NavigationMenuItem key={category.name}>
+                      <NavigationMenuTrigger>{category.name}</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className={cn("grid w-[400px] gap-3 p-4", gridClasses)}>
+                          {category.tools.map((tool) => (
+                            <ListItem
+                              key={tool.name}
+                              title={tool.name}
+                              href={tool.href}
+                            >
+                              {tool.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  )
+                })}
             </NavigationMenuList>
           </NavigationMenu>
         </div>
