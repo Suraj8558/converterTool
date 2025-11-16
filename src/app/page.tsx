@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -32,7 +33,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <section className="text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 font-headline bg-gradient-to-r from-primary to-tertiary text-transparent bg-clip-text">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4 font-headline bg-gradient-to-r from-primary to-tertiary text-transparent bg-clip-text pb-2">
           Your Digital Toolkit, Perfected.
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-4xl mx-auto mb-8">
