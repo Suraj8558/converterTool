@@ -46,8 +46,8 @@ export default function ContactPage() {
   return (
     <>
       <head>
-        <title>Contact Us - devSuraj</title>
-        <meta name="description" content="Get in touch with the devSuraj team." />
+        <title>Contact Us - tools.typingSnap</title>
+        <meta name="description" content="Get in touch with the tools.typingSnap team." />
       </head>
       <div className="container mx-auto max-w-2xl py-12">
         <Card>

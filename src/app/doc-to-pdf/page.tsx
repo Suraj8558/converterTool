@@ -1,18 +1,17 @@
-import { Converter } from '@/components/converter';
+import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'DOC to PDF Converter - devSuraj',
+  title: 'DOC to PDF Converter - tools.typingSnap',
   description: 'Convert Microsoft Word documents (DOC, DOCX) to PDF format for free.',
 };
 
 export default function DocToPdfPage() {
   return (
-    <Converter 
+    <ComingSoon
       title="DOC to PDF Converter"
-      description="Convert your Word documents to PDF for easy sharing, archiving, and printing."
-      fromType="doc,docx"
-      toType="pdf"
+      description="Convert Word documents to PDF for universal sharing and printing."
+      reason="Converting DOC/DOCX to PDF requires server-side rendering tools (e.g., LibreOffice or Pandoc). This feature is not yet available but is coming soon."
     />
   );
 }
