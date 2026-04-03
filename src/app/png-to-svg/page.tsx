@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PNG to SVG Converter - devSuraj',
+  title: 'PNG to SVG Converter - tools.typingSnap',
   description: 'Convert PNG images to scalable vector graphics (SVG) online.',
 };
 

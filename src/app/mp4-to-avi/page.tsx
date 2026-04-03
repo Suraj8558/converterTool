@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'MP4 to AVI Converter - devSuraj',
+  title: 'MP4 to AVI Converter - tools.typingSnap',
   description: 'Easily convert your MP4 video files to AVI format online for free.',
 };
 

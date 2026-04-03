@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'EPUB to MOBI Converter - devSuraj',
+  title: 'EPUB to MOBI Converter - tools.typingSnap',
   description: 'Convert EPUB e-books to MOBI format for your Kindle device.',
 };
 

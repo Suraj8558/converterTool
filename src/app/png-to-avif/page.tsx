@@ -2,7 +2,7 @@ import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PNG to AVIF Converter - devSuraj',
+  title: 'PNG to AVIF Converter - tools.typingSnap',
   description: 'Convert PNG images to the next-generation AVIF format for superior compression.',
 };
 

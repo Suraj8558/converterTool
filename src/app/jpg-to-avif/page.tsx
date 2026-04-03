@@ -2,7 +2,7 @@ import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'JPG to AVIF Converter - devSuraj',
+  title: 'JPG to AVIF Converter - tools.typingSnap',
   description: 'Convert JPG images to the next-generation AVIF format for superior compression.',
 };
 

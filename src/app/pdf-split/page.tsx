@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF Split - devSuraj',
+  title: 'PDF Split - tools.typingSnap',
   description: 'Split a single PDF into multiple files by page ranges.',
 };
 

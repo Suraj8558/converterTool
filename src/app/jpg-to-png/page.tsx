@@ -2,7 +2,7 @@ import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'JPG to PNG Converter - devSuraj',
+  title: 'JPG to PNG Converter - tools.typingSnap',
   description: 'Easily and quickly convert your JPG images to high-quality PNG format for free.',
 };
 

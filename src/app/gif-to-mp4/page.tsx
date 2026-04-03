@@ -3,7 +3,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'GIF to MP4 Converter - devSuraj',
+  title: 'GIF to MP4 Converter - tools.typingSnap',
   description: 'Convert animated GIF files to MP4 videos online for free.',
 };
 

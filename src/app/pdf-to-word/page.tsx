@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF to Word Converter - devSuraj',
+  title: 'PDF to Word Converter - tools.typingSnap',
   description: 'Convert PDF files to editable Microsoft Word documents.',
 };
 

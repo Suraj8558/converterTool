@@ -2,7 +2,7 @@ import { ImageCompressor } from '@/components/image-compressor';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Image Compressor - devSuraj',
+  title: 'Image Compressor - tools.typingSnap',
   description: 'Compress JPG, PNG, and WebP images online to reduce their file size.',
 };
 

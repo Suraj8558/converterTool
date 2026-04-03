@@ -10,7 +10,7 @@ export default function Header() {
         <Link href="/" className="flex items-center space-x-2">
           <SheetIcon className="h-6 w-6 text-primary" />
           <span className="font-bold font-headline">
-            devSuraj
+            tools.typingSnap
           </span>
         </Link>
         <div className="flex items-center space-x-2">
@@ -19,4 +19,4 @@ export default function Header() {
       </div>
     </header>
   );
-}
+}

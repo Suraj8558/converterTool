@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PDF Merge - devSuraj',
+  title: 'PDF Merge - tools.typingSnap',
   description: 'Combine multiple PDF files into one single document.',
 };
 

@@ -2,7 +2,7 @@ import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'MP3 to WAV Converter - devSuraj',
+  title: 'MP3 to WAV Converter - tools.typingSnap',
   description: 'Easily convert your MP3 audio files to uncompressed WAV format for free.',
 };
 
