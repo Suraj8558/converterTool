@@ -1,4 +1,4 @@
-import { Converter } from '@/components/converter';
+import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,11 +8,10 @@ export const metadata: Metadata = {
 
 export default function Mp4ToAviPage() {
   return (
-    <Converter 
+    <ComingSoon
       title="MP4 to AVI Converter"
-      description="Convert your MP4 videos to AVI format in just a few clicks."
-      fromType="mp4"
-      toType="avi"
+      description="Convert MP4 videos to AVI format for legacy media players."
+      reason="Video transcoding (MP4 → AVI) requires server-side processing with tools like FFmpeg. This feature is not yet available but is coming soon."
     />
   );
 }

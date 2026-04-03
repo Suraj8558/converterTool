@@ -1,4 +1,4 @@
-import { Converter } from '@/components/converter';
+import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,11 +8,10 @@ export const metadata: Metadata = {
 
 export default function WordToPdfPage() {
   return (
-    <Converter 
+    <ComingSoon
       title="Word to PDF Converter"
-      description="Convert your Word documents to PDF for easy sharing, archiving, and printing."
-      fromType="doc,docx"
-      toType="pdf"
+      description="Create professional, secure PDF files from your Word documents."
+      reason="Converting DOCX to PDF requires server-side rendering tools (e.g., LibreOffice or Pandoc). This feature is not yet available but is coming soon."
     />
   );
 }

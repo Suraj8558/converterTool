@@ -1,4 +1,4 @@
-import { BacklinkChecker } from '@/components/backlink-checker';
+import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,14 +8,10 @@ export const metadata: Metadata = {
 
 export default function BacklinkCheckerPage() {
   return (
-    <div className="container mx-auto max-w-5xl py-12">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold tracking-tight font-headline">AI Backlink Checker</h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Get a quick analysis of any website's backlink profile.
-        </p>
-      </div>
-      <BacklinkChecker />
-    </div>
+    <ComingSoon
+      title="AI Backlink Checker"
+      description="Analyze the backlink profile of any domain."
+      reason="Accurate backlink analysis requires deep crawling and indexing of the entire web. Our current AI model simulates this, but we're working on a real-time data connection."
+    />
   );
 }

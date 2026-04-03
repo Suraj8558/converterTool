@@ -1,7 +1,5 @@
 
-import { Converter } from '@/components/converter';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { ComingSoon } from '@/components/coming-soon';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -11,22 +9,10 @@ export const metadata: Metadata = {
 
 export default function GifToMp4Page() {
   return (
-    <>
-      <div className="container mx-auto max-w-3xl pt-12">
-        <Alert>
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Developer Note</AlertTitle>
-          <AlertDescription>
-            This converter is currently a demonstration. A full GIF to MP4 conversion requires backend processing and will be implemented soon.
-          </AlertDescription>
-        </Alert>
-      </div>
-      <Converter 
-        title="GIF to MP4 Converter"
-        description="Convert your animated GIF images to MP4 videos in seconds."
-        fromType="gif"
-        toType="mp4"
-      />
-    </>
+    <ComingSoon
+      title="GIF to MP4 Converter"
+      description="Convert your animated GIFs into lightweight, high-quality MP4 videos."
+      reason="Video encoding (GIF → MP4) requires server-side processing with tools like FFmpeg. This feature is not yet available but is coming soon."
+    />
   );
 }
