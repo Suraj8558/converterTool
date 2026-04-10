@@ -11,6 +11,11 @@ import Script from 'next/script';
 export const metadata: Metadata = {
   title: 'tools.typingSnap - All-in-One Converter & Productivity Tools',
   description: 'Easily convert files, edit PDFs, and optimize images with our all-in-one platform.',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 const inter = Inter({
