@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Sheet } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function Footer() {
   return (
@@ -8,11 +8,11 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
-              <Sheet className="h-6 w-6 text-primary" />
+              <Logo width={32} height={28} />
               <span className="font-bold font-headline">tools.typingSnap</span>
             </Link>
             <p className="text-sm text-muted-foreground mt-2">
-              All-in-one file conversion and SEO tools.
+              All-in-one file conversion and productivity tools.
             </p>
           </div>
         </div>
