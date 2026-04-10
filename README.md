@@ -1,53 +1,127 @@
-# devSuraj - All-in-One File Converter & SEO Toolkit
+# typingSnap Tools — All-in-One File Converter & Productivity Toolkit
 
-devSuraj is a comprehensive, open-source web application built with Next.js and Firebase that provides a powerful suite of tools for file conversion, image manipulation, and PDF management. It's designed to be fast, secure, and user-friendly, with most processing handled client-side for maximum privacy.
+**tools.typingSnap** is a fast, open-source web application built with Next.js that provides a comprehensive suite of tools for file conversion, image manipulation, and PDF management. Most processing happens entirely client-side, keeping your files private and secure.
+
+---
 
 ## ✨ Features
 
-- **Image Tools**: Convert between formats (JPG, PNG, SVG, AVIF, WebP), resize, compress, remove backgrounds, and create passport photos.
-- **File Converters**: Switch between various document, audio, and video formats.
-- **PDF Toolkit**: Edit, merge, split, and convert PDF documents with ease.
-- **SEO Tools**: Analyze websites with a backlink checker, keyword research tool, and plagiarism detector.
-- **AI-Powered**: Utilizes generative AI to power features like background removal and SEO analysis.
-- **Client-Side Processing**: Most file manipulations happen directly in your browser, ensuring your data remains private and secure.
-- **Modern UI/UX**: A clean, responsive, and intuitive interface built with ShadCN UI, Tailwind CSS, and Lucide Icons. Includes dark mode support.
-- **Searchable**: Quickly find the exact tool you need with a powerful on-site search.
+### 🖼️ Image Tools
+- Convert between formats: **JPG ↔ PNG**, **PNG → SVG**, **SVG → PNG**, **JPG/PNG → AVIF**, **WebP → JPG**
+- **Image Compressor** — reduce file sizes without quality loss
+- **Image Resizer** — resize images to custom dimensions
+
+### 📄 PDF Toolkit
+- **Merge PDFs** — combine multiple PDF files into one
+- **Split PDFs** — extract specific pages from a PDF
+- **PDF to Word** — convert PDF documents to editable format
+- **Word to PDF** — convert Word documents to PDF
+
+### 🎵 Audio & Video Converters
+- **MP3 → WAV** — audio format conversion
+- **MP4 → AVI** — video format conversion
+- **GIF → MP4** — animated GIF to video
+
+### 📚 Document Converters
+- **DOC → PDF** — Word documents to PDF
+- **EPUB → MOBI** — eBook format conversion
+
+### 🌐 Other
+- **Dark Mode** — full light/dark theme support
+- **Searchable Tools** — quickly find the exact tool you need
+- **Fully Responsive** — works seamlessly on desktop and mobile
+
+---
 
 ## 💻 Tech Stack
 
-- **Framework**: [Next.js](https://nextjs.org/) (with App Router)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [ShadCN UI](https://ui.shadcn.com/)
-- **Generative AI**: [Google's Gemini models via Genkit](https://firebase.google.com/docs/genkit)
-- **PDF Manipulation**: [pdf-lib](https://pdf-lib.js.org/) & [pdf.js](https://mozilla.github.io/pdf.js/)
-- **Deployment**: [Firebase App Hosting](https://firebase.google.com/docs/app-hosting)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
+| Layer | Technology |
+|---|---|
+| **Framework** | [Next.js 15](https://nextjs.org/) (App Router, Turbopack) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Styling** | [Tailwind CSS](https://tailwindcss.com/) & [ShadCN UI](https://ui.shadcn.com/) |
+| **UI Components** | [Radix UI](https://www.radix-ui.com/), [Lucide Icons](https://lucide.dev/) |
+| **Forms** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
+| **PDF Manipulation** | [pdf-lib](https://pdf-lib.js.org/) |
+| **Charts** | [Recharts](https://recharts.org/) |
+| **Fonts** | Inter & Lexend (Google Fonts via `next/font`) |
+| **Analytics** | Google Tag Manager |
+| **Deployment** | [Firebase App Hosting](https://firebase.google.com/docs/app-hosting) |
+
+---
 
 ## 🚀 Getting Started
 
-To get a local copy up and running, follow these simple steps.
-
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
+- **Node.js** v18 or higher
+- **npm** (or yarn / pnpm)
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```sh
-   git clone https://github.com/your-username/convertiq.git
+   git clone https://github.com/Suraj8558/converterTool.git
+   cd converterTool
    ```
-2. Navigate to the project directory:
-   ```sh
-   cd convertiq
-   ```
-3. Install NPM packages:
+
+2. **Install dependencies:**
    ```sh
    npm install
    ```
-4. Run the development server:
+
+3. **Start the development server:**
    ```sh
    npm run dev
    ```
 
-Open [http://localhost:9002](http://localhost:9002) with your browser to see the result.
+4. Open [http://localhost:9002](http://localhost:9002) in your browser.
+
+### Available Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server on port 9002 (with Turbopack) |
+| `npm run build` | Build for production |
+| `npm run start` | Start the production server |
+| `npm run lint` | Run ESLint |
+| `npm run typecheck` | Run TypeScript type checking |
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                  # Next.js App Router pages & routes
+│   ├── image-compressor/ # Image compression tool
+│   ├── image-resizer/    # Image resize tool
+│   ├── jpg-to-png/       # Format conversion pages
+│   ├── pdf-merge/        # PDF merge tool
+│   ├── pdf-split/        # PDF split tool
+│   ├── word-to-pdf/      # Word → PDF converter
+│   ├── mp3-to-wav/       # Audio converter
+│   ├── mp4-to-avi/       # Video converter
+│   └── ...               # Other converter routes
+├── components/           # Reusable UI components
+│   ├── layout/           # Header & Footer
+│   └── ui/               # ShadCN UI components
+├── hooks/                # Custom React hooks
+└── lib/                  # Utility functions
+```
+
+---
+
+## 🔒 Privacy
+
+All file conversions happen **directly in your browser**. No files are uploaded to any server, ensuring complete privacy and fast processing without network delays.
+
+---
+
+## 📄 License
+
+This project is open-source. See the repository for license details.
+
+---
+
+> Built with ❤️ by [typingSnap](https://typingsnap.com)
