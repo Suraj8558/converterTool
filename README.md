@@ -37,7 +37,7 @@
 
 | Layer | Technology |
 |---|---|
-| **Framework** | [Next.js 15](https://nextjs.org/) (App Router, Turbopack) |
+| **Framework** | [Next.js 16](https://nextjs.org/) (App Router, Turbopack) |
 | **Language** | [TypeScript](https://www.typescriptlang.org/) |
 | **Styling** | [Tailwind CSS](https://tailwindcss.com/) & [ShadCN UI](https://ui.shadcn.com/) |
 | **UI Components** | [Radix UI](https://www.radix-ui.com/), [Lucide Icons](https://lucide.dev/) |
