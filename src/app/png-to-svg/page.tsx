@@ -1,17 +1,21 @@
-import { ComingSoon } from '@/components/coming-soon';
+import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'PNG to SVG Converter - tools.typingSnap',
-  description: 'Convert PNG images to scalable vector graphics (SVG) online.',
-};
+export const metadata: Metadata = pageMetadata(
+  'PNG to SVG Converter - Converter Tool',
+  'Trace PNG images into scalable SVG vector graphics.',
+  '/png-to-svg'
+);
 
 export default function PngToSvgPage() {
   return (
-    <ComingSoon
+    <Converter
       title="PNG to SVG Converter"
-      description="Convert PNG images into scalable SVG vector graphics."
-      reason="Converting a raster image (PNG) to a vector (SVG) is a process called image tracing/vectorization. It requires a dedicated algorithm that is not yet integrated."
+      description="Trace your PNG images into scalable SVG vectors. Works best on logos, icons and flat artwork."
+      fromType="png"
+      toType="svg"
+      engine="png-to-svg"
     />
   );
 }

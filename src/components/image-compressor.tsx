@@ -1,10 +1,11 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { UploadCloud, Download, RotateCcw, Shrink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Download, RotateCcw, Shrink } from 'lucide-react';
 import NextImage from 'next/image';
 import { Button } from '@/components/ui/button';
+import { FileDropzone } from '@/components/file-dropzone';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
@@ -18,52 +19,21 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-export function ImageCompressor() {
-  const [originalFile, setOriginalFile] = useState<File | null>(null);
-  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
-  const [originalFileSize, setOriginalFileSize] = useState<number | null>(null);
-
-  const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null);
-  const [compressedImageUrl, setCompressedImageUrl] = useState<string | null>(null);
-  const [compressedFileSize, setCompressedFileSize] = useState<number | null>(null);
-
-  const [quality, setQuality] = useState(0.8);
-  const [isCompressing, setIsCompressing] = useState(false);
-  const { toast } = useToast();
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      resetState(false); // Soft reset
-      setOriginalFile(file);
-      setOriginalFileSize(file.size);
-      const url = URL.createObjectURL(file);
-      setOriginalImageUrl(url);
-    } else if (file) {
-      toast({
-        title: 'Invalid File Type',
-        description: 'Please select a valid image file (JPG, PNG, WebP).',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const compressImage = useCallback(async () => {
-    if (!originalFile) return;
-
-    setIsCompressing(true);
-
+const compressToJpeg = (file: File, quality: number): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const sourceUrl = URL.createObjectURL(file);
     const img = new window.Image();
-    img.src = URL.createObjectURL(originalFile);
-    await new Promise((resolve) => { img.onload = resolve; });
-
-    try {
+    img.onload = () => {
+      URL.revokeObjectURL(sourceUrl);
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error('Could not get canvas context');
-      
+      if (!ctx) {
+        reject(new Error('Could not get canvas context'));
+        return;
+      }
+
       // Add a white background for images with transparency (like PNGs)
       // as JPG does not support transparency.
       ctx.fillStyle = '#FFFFFF';
@@ -73,49 +43,89 @@ export function ImageCompressor() {
       canvas.toBlob(
         (blob) => {
           if (blob) {
-            if (compressedImageUrl) URL.revokeObjectURL(compressedImageUrl);
-            setCompressedBlob(blob);
-            setCompressedImageUrl(URL.createObjectURL(blob));
-            setCompressedFileSize(blob.size);
+            resolve(blob);
           } else {
-            throw new Error('Canvas to Blob conversion failed');
+            reject(new Error('Canvas to Blob conversion failed'));
           }
-          setIsCompressing(false);
         },
         'image/jpeg', // Always compress to JPG for effective size reduction
         quality
       );
-    } catch (error) {
-      console.error("Image compression failed:", error);
-      toast({
-        title: 'Compression Failed',
-        description: 'An error occurred while compressing the image.',
-        variant: 'destructive',
-      });
-      setIsCompressing(false);
-    }
-  }, [originalFile, quality, toast, compressedImageUrl]);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(sourceUrl);
+      reject(new Error('Failed to load image'));
+    };
+    img.src = sourceUrl;
+  });
+};
 
+export function ImageCompressor() {
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
+  const [originalFileSize, setOriginalFileSize] = useState<number | null>(null);
+
+  const [compressedImageUrl, setCompressedImageUrl] = useState<string | null>(null);
+  const [compressedFileSize, setCompressedFileSize] = useState<number | null>(null);
+
+  const [quality, setQuality] = useState(0.8);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const { toast } = useToast();
+
+  const handleFile = (file: File) => {
+    resetState(false); // Soft reset
+    setOriginalFile(file);
+    setOriginalFileSize(file.size);
+    setOriginalImageUrl(URL.createObjectURL(file));
+  };
+
+  // Compress only when the file or quality changes. The result must not be a
+  // dependency here, or each finished compression would trigger the next one.
   useEffect(() => {
-    const handler = setTimeout(() => {
-      if (originalFile) {
-        compressImage();
+    if (!originalFile) return;
+
+    let cancelled = false;
+    const handler = setTimeout(async () => {
+      setIsCompressing(true);
+      try {
+        const blob = await compressToJpeg(originalFile, quality);
+        if (cancelled) return;
+        setCompressedImageUrl(URL.createObjectURL(blob));
+        setCompressedFileSize(blob.size);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Image compression failed:", error);
+        toast({
+          title: 'Compression Failed',
+          description: 'An error occurred while compressing the image.',
+          variant: 'destructive',
+        });
       }
+      setIsCompressing(false);
     }, 500); // Debounce compression
-    return () => clearTimeout(handler);
-  }, [quality, originalFile, compressImage]);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(handler);
+    };
+  }, [quality, originalFile, toast]);
+
+  // Release each compressed image once it is replaced, or on unmount.
+  useEffect(() => {
+    if (!compressedImageUrl) return;
+    return () => URL.revokeObjectURL(compressedImageUrl);
+  }, [compressedImageUrl]);
 
   const resetState = (fullReset = true) => {
     if (originalImageUrl) URL.revokeObjectURL(originalImageUrl);
-    if (compressedImageUrl) URL.revokeObjectURL(compressedImageUrl);
-    
+
+
     if (fullReset) {
       setOriginalFile(null);
       setOriginalImageUrl(null);
       setOriginalFileSize(null);
     }
     
-    setCompressedBlob(null);
     setCompressedImageUrl(null);
     setCompressedFileSize(null);
     setIsCompressing(false);
@@ -140,14 +150,7 @@ export function ImageCompressor() {
       </CardHeader>
       <CardContent>
         {!originalFile ? (
-          <div 
-            className="border border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted transition-colors bg-muted/50"
-            onClick={() => document.getElementById('image-compressor-upload')?.click()}
-          >
-            <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">Drag & drop your image here, or click to browse</p>
-            <input id="image-compressor-upload" type="file" className="hidden" onChange={handleFileChange} accept="image/jpeg,image/png,image/webp" />
-          </div>
+          <FileDropzone accept="jpg,jpeg,png,webp" multiple={false} onFiles={([file]) => handleFile(file)} />
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
@@ -191,12 +194,14 @@ export function ImageCompressor() {
             </Card>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild className="w-full sm:w-auto flex-1">
-                  <a href={compressedImageUrl ?? ''} download={getFileName()}>
+              {compressedImageUrl && (
+                <Button asChild className="w-full sm:w-auto flex-1">
+                  <a href={compressedImageUrl} download={getFileName()}>
                     <Download className="mr-2 h-4 w-4" />
                     Download Compressed Image
                   </a>
-              </Button>
+                </Button>
+              )}
               <Button onClick={() => resetState(true)} variant="outline" className="w-full sm:w-auto flex-1">
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Compress Another

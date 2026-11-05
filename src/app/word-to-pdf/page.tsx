@@ -1,17 +1,21 @@
-import { ComingSoon } from '@/components/coming-soon';
+import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'Word to PDF Converter - tools.typingSnap',
-  description: 'Convert Microsoft Word documents (DOC, DOCX) to PDF format for free.',
-};
+export const metadata: Metadata = pageMetadata(
+  'Word to PDF Converter - Converter Tool',
+  'Convert Word (.docx) documents to PDF.',
+  '/word-to-pdf'
+);
 
 export default function WordToPdfPage() {
   return (
-    <ComingSoon
+    <Converter
       title="Word to PDF Converter"
-      description="Create professional, secure PDF files from your Word documents."
-      reason="Converting DOCX to PDF requires server-side rendering tools (e.g., LibreOffice or Pandoc). This feature is not yet available but is coming soon."
+      description="Convert .docx documents to PDF, keeping headings, lists, tables and images. The page layout may differ from Word. For older .doc files, use Save As in Word to create a .docx first."
+      fromType="docx"
+      toType="pdf"
+      engine="docx-to-pdf"
     />
   );
 }

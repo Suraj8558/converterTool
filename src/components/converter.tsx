@@ -2,16 +2,20 @@
 'use client';
 
 import { useState } from 'react';
-import { UploadCloud, File as FileIcon, X, Download, RotateCcw } from 'lucide-react';
+import { File as FileIcon, X, Download, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { FileDropzone } from '@/components/file-dropzone';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { runConversion, type ConversionEngine } from '@/lib/conversions';
 
 const convertImageOnClient = (file: File, toType: string): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    // Unlike other formats, SVG won't load unless its type is declared, and browsers can leave it blank.
+    const isSvg = file.name.toLowerCase().endsWith('.svg');
+    reader.readAsDataURL(isSvg ? new Blob([file], { type: 'image/svg+xml' }) : file);
     reader.onload = (event) => {
       if (!event.target?.result) {
         return reject(new Error("Failed to read file"));
@@ -38,10 +42,13 @@ const convertImageOnClient = (file: File, toType: string): Promise<Blob> => {
         const mimeType = `image/${lowerCaseToType === 'jpg' ? 'jpeg' : lowerCaseToType}`;
         
         canvas.toBlob((blob) => {
-          if (blob) {
-            resolve(blob);
-          } else {
+          if (!blob) {
             reject(new Error('Canvas to Blob conversion failed'));
+          } else if (blob.type !== mimeType) {
+            // Browsers silently fall back to PNG for formats they can't encode.
+            reject(new Error(`This browser cannot encode ${mimeType}`));
+          } else {
+            resolve(blob);
           }
         }, mimeType, 0.9);
       };
@@ -60,6 +67,8 @@ interface ConverterProps {
   description: string;
   fromType: string;
   toType: string;
+  /** Leave unset for image formats the browser's canvas can encode. */
+  engine?: ConversionEngine;
 }
 
 interface ConvertedFile {
@@ -67,36 +76,13 @@ interface ConvertedFile {
     url: string;
 }
 
-export function Converter({ title, description, fromType, toType }: ConverterProps) {
+export function Converter({ title, description, fromType, toType, engine }: ConverterProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [isConverting, setIsConverting] = useState(false);
   const [conversionProgress, setConversionProgress] = useState(0);
   const [convertedFiles, setConvertedFiles] = useState<ConvertedFile[]>([]);
   const [conversionComplete, setConversionComplete] = useState(false);
   const { toast } = useToast();
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFiles(Array.from(event.target.files));
-      setConversionComplete(false);
-      setConvertedFiles([]);
-    }
-  };
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.dataTransfer.files) {
-      setFiles(Array.from(event.dataTransfer.files));
-      setConversionComplete(false);
-      setConvertedFiles([]);
-    }
-  };
-  
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
 
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
@@ -108,50 +94,34 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
     setConversionComplete(false);
     setConversionProgress(0);
 
-    const progressInterval = setInterval(() => {
-      setConversionProgress(prev => {
-        if (prev >= 95) {
-          clearInterval(progressInterval);
-          return 95;
-        }
-        return prev + 10;
-      });
-    }, 150);
-
-    const isImageConversion = ['png', 'jpg', 'jpeg', 'webp', 'avif'].includes(toType.toLowerCase());
-
+    const results: ConvertedFile[] = [];
     try {
-      const conversionPromises = files.map(async (file) => {
-        const originalName = file.name.lastIndexOf('.') > -1 
+      // One at a time: the encoders are memory-heavy and FFmpeg can't run in parallel.
+      for (const [index, file] of files.entries()) {
+        const reportProgress = (fraction: number) =>
+          setConversionProgress(Math.round(((index + fraction) / files.length) * 100));
+
+        const originalName = file.name.lastIndexOf('.') > -1
           ? file.name.substring(0, file.name.lastIndexOf('.'))
           : file.name;
-        const newName = `${originalName}.${toType}`;
-        
-        let blob: Blob;
-        if (isImageConversion) {
-          blob = await convertImageOnClient(file, toType);
-        } else {
-          // Fallback for non-image types
-          const dummyContent = `This is a simulated converted file: ${newName} from ${file.name}`;
-          blob = new Blob([dummyContent], { type: 'application/octet-stream' });
-        }
+        const blob = engine
+          ? await runConversion(engine, file, reportProgress)
+          : await convertImageOnClient(file, toType);
 
-        const url = URL.createObjectURL(blob);
-        return { name: newName, url };
-      });
+        results.push({ name: `${originalName}.${toType}`, url: URL.createObjectURL(blob) });
+        reportProgress(1);
+      }
 
-      const newConvertedFiles = await Promise.all(conversionPromises);
-      
-      clearInterval(progressInterval);
-      setConversionProgress(100);
-      setConvertedFiles(newConvertedFiles);
+      setConvertedFiles(results);
       setConversionComplete(true);
     } catch (error) {
       console.error("File conversion failed:", error);
-      clearInterval(progressInterval);
+      results.forEach((result) => URL.revokeObjectURL(result.url));
       toast({
         title: 'Conversion Failed',
-        description: 'An error occurred during file conversion. Please check the file format and try again.',
+        description: error instanceof Error && engine
+          ? error.message
+          : 'An error occurred during file conversion. Please check the file format and try again.',
         variant: 'destructive',
       });
     } finally {
@@ -184,7 +154,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
     zip.generateAsync({ type: 'blob' }).then(content => {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(content);
-        link.download = `ConvertIQ_files.zip`;
+        link.download = `converted_files.zip`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -212,24 +182,14 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
         <CardContent className="space-y-6">
           {!conversionComplete ? (
             <>
-              <div 
-                className="border border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted transition-colors bg-muted/50"
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onClick={() => document.getElementById('file-upload')?.click()}
-              >
-                <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-                <p className="mt-4 text-muted-foreground">Drag & drop your files here, or click to browse</p>
-                <p className="text-xs text-muted-foreground mt-1">Supported format(s): .{fromType.replace(/,/g, ', .')}</p>
-                <input
-                  id="file-upload"
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  accept={fromType.split(',').map(t => `.${t.trim()}`).join(',')}
-                  multiple
-                />
-              </div>
+              <FileDropzone
+                accept={fromType}
+                onFiles={(selected) => {
+                  setFiles(selected);
+                  setConversionComplete(false);
+                  setConvertedFiles([]);
+                }}
+              />
 
               {files.length > 0 && !isConverting && (
                 <div className="space-y-2">
@@ -240,7 +200,7 @@ export function Converter({ title, description, fromType, toType }: ConverterPro
                         <FileIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                         <span className="text-sm truncate">{file.name}</span>
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => removeFile(index)}>
+                      <Button variant="ghost" size="icon" aria-label={`Remove ${file.name}`} onClick={() => removeFile(index)}>
                         <X className="h-4 w-4" />
                       </Button>
                     </div>

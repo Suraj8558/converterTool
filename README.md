@@ -1,30 +1,35 @@
-# typingSnap Tools — All-in-One File Converter & Productivity Toolkit
+# Converter Tool — All-in-One File Converter & Productivity Toolkit
 
-**tools.typingSnap** is a fast, open-source web application built with Next.js that provides a comprehensive suite of tools for file conversion, image manipulation, and PDF management. Most processing happens entirely client-side, keeping your files private and secure.
+**Converter Tool** is a fast, open-source web application built with Next.js that provides a comprehensive suite of tools for file conversion, image manipulation, and PDF management. All processing happens in your browser, so your files stay private.
+
+**📖 [Read the documentation](docs/README.md)**, including [what every tool does and its limits](docs/features.md).
 
 ---
 
 ## ✨ Features
 
 ### 🖼️ Image Tools
-- Convert between formats: **JPG ↔ PNG**, **PNG → SVG**, **SVG → PNG**, **JPG/PNG → AVIF**, **WebP → JPG**
-- **Image Compressor** — reduce file sizes without quality loss
+- Convert between formats: **JPG ↔ PNG**, **PNG → SVG**, **SVG → PNG**, **JPG/PNG → AVIF**, **WebP → JPG**, **HEIC → JPG**
+- **Image Compressor** — reduce file sizes with adjustable quality
 - **Image Resizer** — resize images to custom dimensions
 
 ### 📄 PDF Toolkit
 - **Merge PDFs** — combine multiple PDF files into one
 - **Split PDFs** — extract specific pages from a PDF
-- **PDF to Word** — convert PDF documents to editable format
-- **Word to PDF** — convert Word documents to PDF
+- **Compress PDFs** — shrink a PDF, optionally rebuilding its pages as images
+- **Images to PDF** — combine JPG, PNG and WebP images into one PDF, with page size and margin options
+- **Organize PDFs** — reorder, remove or add pages
+- **Rotate and Crop PDFs** — turn pages, or keep just the area you need
+- **Page Numbers and Watermarks** — stamp numbers, text or images on every page
+- **PDF to JPG** — save each page as an image
+- **PDF to Word** — extract PDF text into an editable .docx (no images, tables or scanned PDFs)
+- **Word to PDF** — convert .docx documents to PDF (Latin, Greek and Cyrillic text)
+- **EPUB → MOBI** — convert unprotected e-books for older e-readers
 
 ### 🎵 Audio & Video Converters
 - **MP3 → WAV** — audio format conversion
 - **MP4 → AVI** — video format conversion
 - **GIF → MP4** — animated GIF to video
-
-### 📚 Document Converters
-- **DOC → PDF** — Word documents to PDF
-- **EPUB → MOBI** — eBook format conversion
 
 ### 🌐 Other
 - **Dark Mode** — full light/dark theme support
@@ -42,8 +47,8 @@
 | **Styling** | [Tailwind CSS](https://tailwindcss.com/) & [ShadCN UI](https://ui.shadcn.com/) |
 | **UI Components** | [Radix UI](https://www.radix-ui.com/), [Lucide Icons](https://lucide.dev/) |
 | **Forms** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) |
-| **PDF Manipulation** | [pdf-lib](https://pdf-lib.js.org/) |
-| **Charts** | [Recharts](https://recharts.org/) |
+| **File Processing** | pdf-lib, PDF.js, FFmpeg (WebAssembly), and [others](docs/architecture.md#tech-stack) |
+| **Testing** | [Vitest](https://vitest.dev/), [Playwright](https://playwright.dev/) |
 | **Fonts** | Inter & Lexend (Google Fonts via `next/font`) |
 | **Analytics** | Google Tag Manager |
 | **Deployment** | [Firebase App Hosting](https://firebase.google.com/docs/app-hosting) |
@@ -54,7 +59,7 @@
 
 ### Prerequisites
 
-- **Node.js** v18 or higher
+- **Node.js** v22.12 or higher
 - **npm** (or yarn / pnpm)
 
 ### Installation
@@ -77,6 +82,15 @@
 
 4. Open [http://localhost:9002](http://localhost:9002) in your browser.
 
+### Environment Variables
+
+Set these at build time for production, such as in `apphosting.yaml` (see [Deployment](docs/deployment.md)):
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | The site's public address, used in the sitemap and sharing tags (e.g. `https://example.com`) |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | The address the contact form opens an email to; the form is disabled without it |
+
 ### Available Scripts
 
 | Command | Description |
@@ -85,6 +99,8 @@
 | `npm run build` | Build for production |
 | `npm run start` | Start the production server |
 | `npm run lint` | Run ESLint |
+| `npm test` | Run unit tests |
+| `npm run test:e2e` | Run browser tests (see [Testing](docs/testing.md)) |
 | `npm run typecheck` | Run TypeScript type checking |
 
 ---
@@ -92,22 +108,18 @@
 ## 📁 Project Structure
 
 ```
+docs/                     # Project documentation
+e2e/                      # Browser tests and sample files
+scripts/                  # Build scripts
 src/
-├── app/                  # Next.js App Router pages & routes
-│   ├── image-compressor/ # Image compression tool
-│   ├── image-resizer/    # Image resize tool
-│   ├── jpg-to-png/       # Format conversion pages
-│   ├── pdf-merge/        # PDF merge tool
-│   ├── pdf-split/        # PDF split tool
-│   ├── word-to-pdf/      # Word → PDF converter
-│   ├── mp3-to-wav/       # Audio converter
-│   ├── mp4-to-avi/       # Video converter
-│   └── ...               # Other converter routes
-├── components/           # Reusable UI components
-│   ├── layout/           # Header & Footer
+├── app/                  # One folder per page
+├── components/           # Tool interfaces and shared components
+│   ├── layout/           # Header, footer and tool menus
 │   └── ui/               # ShadCN UI components
 ├── hooks/                # Custom React hooks
-└── lib/                  # Utility functions
+└── lib/
+    ├── conversions/      # Conversion engines and unit tests
+    └── tools.tsx         # The list of tools, which drives every menu
 ```
 
 ---
@@ -120,8 +132,4 @@ All file conversions happen **directly in your browser**. No files are uploaded 
 
 ## 📄 License
 
-This project is open-source. See the repository for license details.
-
----
-
-> Built with ❤️ by [typingSnap](https://typingsnap.com)
+No license has been chosen yet. See [Licensing](docs/deployment.md#licensing).

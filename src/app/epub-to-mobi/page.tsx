@@ -1,17 +1,21 @@
-import { ComingSoon } from '@/components/coming-soon';
+import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'EPUB to MOBI Converter - tools.typingSnap',
-  description: 'Convert EPUB e-books to MOBI format for your Kindle device.',
-};
+export const metadata: Metadata = pageMetadata(
+  'EPUB to MOBI Converter - Converter Tool',
+  'Convert EPUB e-books to MOBI format.',
+  '/epub-to-mobi'
+);
 
 export default function EpubToMobiPage() {
   return (
-    <ComingSoon
+    <Converter
       title="EPUB to MOBI Converter"
-      description="Convert EPUB e-books to MOBI format for your Kindle device."
-      reason="E-book format conversion requires server-side tools like Calibre. This feature is not yet available but is coming soon."
+      description="Convert unprotected EPUB e-books to MOBI for older e-readers. Links between chapters and very large images are not kept."
+      fromType="epub"
+      toType="mobi"
+      engine="epub-to-mobi"
     />
   );
 }

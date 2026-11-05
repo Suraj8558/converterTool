@@ -90,13 +90,13 @@ export default function Home() {
           <div className="text-center py-16">
             <Frown className="mx-auto h-12 w-12 text-muted-foreground" />
             <h3 className="mt-4 text-2xl font-semibold">No Tools Found</h3>
-            <p className="mt-1 text-muted-foreground">Your search for "{searchTerm}" did not match any tools.</p>
+            <p className="mt-1 text-muted-foreground">Your search for &quot;{searchTerm}&quot; did not match any tools.</p>
           </div>
         )}
       </section>
 
       <section className="mt-16 md:mt-24 text-center bg-card py-16 rounded-2xl shadow-sm border">
-        <h2 className="text-3xl font-bold mb-4 font-headline">Why Choose tools.typingSnap?</h2>
+        <h2 className="text-3xl font-bold mb-4 font-headline">Why Choose Converter Tool?</h2>
         <p className="text-muted-foreground max-w-2xl mx-auto mb-12">We provide reliable, fast, and secure tools to make your digital life easier.</p>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="text-center p-4 flex flex-col items-center">
@@ -104,7 +104,7 @@ export default function Home() {
                     <ShieldCheck className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 font-headline">Secure & Private</h3>
-                <p className="text-muted-foreground">Your privacy is paramount. Files are processed in your browser or deleted from servers within hours.</p>
+                <p className="text-muted-foreground">Your files are processed in your browser and are never uploaded to our servers.</p>
             </div>
             <div className="text-center p-4 flex flex-col items-center">
                  <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary mb-4">

@@ -1,17 +1,21 @@
-import { ComingSoon } from '@/components/coming-soon';
+import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'MP4 to AVI Converter - tools.typingSnap',
-  description: 'Easily convert your MP4 video files to AVI format online for free.',
-};
+export const metadata: Metadata = pageMetadata(
+  'MP4 to AVI Converter - Converter Tool',
+  'Convert MP4 videos to AVI format.',
+  '/mp4-to-avi'
+);
 
 export default function Mp4ToAviPage() {
   return (
-    <ComingSoon
+    <Converter
       title="MP4 to AVI Converter"
-      description="Convert MP4 videos to AVI format for legacy media players."
-      reason="Video transcoding (MP4 → AVI) requires server-side processing with tools like FFmpeg. This feature is not yet available but is coming soon."
+      description="Convert MP4 videos to AVI. The video engine (about 31 MB) downloads on first use, and large videos can take a while."
+      fromType="mp4"
+      toType="avi"
+      engine="mp4-to-avi"
     />
   );
 }
