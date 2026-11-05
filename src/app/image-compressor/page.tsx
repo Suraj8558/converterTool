@@ -1,10 +1,12 @@
 import { ImageCompressor } from '@/components/image-compressor';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'Image Compressor - tools.typingSnap',
-  description: 'Compress JPG, PNG, and WebP images online to reduce their file size.',
-};
+export const metadata: Metadata = pageMetadata(
+  'Image Compressor - Converter Tool',
+  'Compress JPG, PNG, and WebP images online to reduce their file size.',
+  '/image-compressor'
+);
 
 export default function ImageCompressorPage() {
   return (

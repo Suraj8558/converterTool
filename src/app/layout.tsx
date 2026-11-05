@@ -4,13 +4,18 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
+import { pageMetadata, siteName, siteUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { Inter, Lexend } from 'next/font/google';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'tools.typingSnap - All-in-One Converter & Productivity Tools',
-  description: 'Easily convert files, edit PDFs, and optimize images with our all-in-one platform.',
+  metadataBase: new URL(siteUrl),
+  ...pageMetadata(
+    `${siteName} - All-in-One Converter & Productivity Tools`,
+    'Easily convert files, manage PDFs, and optimize images in your browser. Nothing is uploaded.',
+    '/'
+  ),
   icons: {
     icon: '/icon.svg',
     shortcut: '/icon.svg',

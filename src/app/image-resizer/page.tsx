@@ -1,10 +1,12 @@
 import { ImageResizer } from '@/components/image-resizer';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'Image Resizer - tools.typingSnap',
-  description: 'Resize your JPG, PNG, WebP, or GIF images to any dimensions you need.',
-};
+export const metadata: Metadata = pageMetadata(
+  'Image Resizer - Converter Tool',
+  'Resize your JPG, PNG, WebP, or GIF images to any dimensions you need.',
+  '/image-resizer'
+);
 
 export default function ImageResizerPage() {
   return (

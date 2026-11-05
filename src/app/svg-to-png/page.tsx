@@ -1,10 +1,12 @@
 import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'SVG to PNG Converter - tools.typingSnap',
-  description: 'Easily convert your scalable vector graphics (SVG) to high-quality PNG images.',
-};
+export const metadata: Metadata = pageMetadata(
+  'SVG to PNG Converter - Converter Tool',
+  'Easily convert your scalable vector graphics (SVG) to high-quality PNG images.',
+  '/svg-to-png'
+);
 
 export default function SvgToPngPage() {
   return (

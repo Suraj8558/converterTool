@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { UploadCloud, Download, RotateCcw, Image as ImageIcon, Ruler } from 'lucide-react';
+import { Download, RotateCcw, Image as ImageIcon, Ruler } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FileDropzone } from '@/components/file-dropzone';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,39 +21,38 @@ export function ImageResizer() {
   const [keepAspectRatio, setKeepAspectRatio] = useState(true);
   
   const [resizedImageUrl, setResizedImageUrl] = useState<string | null>(null);
+  const [resizedExtension, setResizedExtension] = useState('');
   const [isResizing, setIsResizing] = useState(false);
   
   const { toast } = useToast();
 
+  // Release each image once it is replaced, or on unmount.
   useEffect(() => {
-    if (originalFile) {
-      const url = URL.createObjectURL(originalFile);
-      setOriginalImageUrl(url);
-      
-      const img = new window.Image();
-      img.src = url;
-      img.onload = () => {
-        setOriginalDimensions({ width: img.width, height: img.height });
-        setWidth(img.width);
-        setHeight(img.height);
-      };
-      
-      return () => URL.revokeObjectURL(url);
-    }
-  }, [originalFile]);
+    if (!originalImageUrl) return;
+    return () => URL.revokeObjectURL(originalImageUrl);
+  }, [originalImageUrl]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.startsWith('image/')) {
+  const handleFile = (file: File) => {
+    resetState();
+    const url = URL.createObjectURL(file);
+    setOriginalFile(file);
+    setOriginalImageUrl(url);
+
+    const img = new window.Image();
+    img.onload = () => {
+      setOriginalDimensions({ width: img.width, height: img.height });
+      setWidth(img.width);
+      setHeight(img.height);
+    };
+    img.onerror = () => {
       resetState();
-      setOriginalFile(file);
-    } else {
       toast({
-        title: 'Invalid File Type',
-        description: 'Please select an image file.',
+        title: 'Could Not Open Image',
+        description: `"${file.name}" could not be read as an image.`,
         variant: 'destructive',
       });
-    }
+    };
+    img.src = url;
   };
 
   const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, dimension: 'width' | 'height') => {
@@ -80,8 +80,18 @@ export function ImageResizer() {
     setIsResizing(true);
     setResizedImageUrl(null);
 
+    const showFailure = (error: unknown) => {
+      console.error("Image resizing failed:", error);
+      toast({
+        title: 'Resizing Failed',
+        description: 'An error occurred while resizing the image. Try smaller dimensions.',
+        variant: 'destructive',
+      });
+      setIsResizing(false);
+    };
+
     const img = new window.Image();
-    img.src = originalImageUrl!;
+    img.onerror = showFailure;
     img.onload = () => {
       try {
         const canvas = document.createElement('canvas');
@@ -89,32 +99,28 @@ export function ImageResizer() {
         canvas.height = Number(height);
         const ctx = canvas.getContext('2d');
         if (!ctx) throw new Error('Could not get canvas context');
-        
+
         ctx.drawImage(img, 0, 0, Number(width), Number(height));
-        
+
         canvas.toBlob((blob) => {
-          if (blob) {
-            if(resizedImageUrl) URL.revokeObjectURL(resizedImageUrl);
-            setResizedImageUrl(URL.createObjectURL(blob));
-          } else {
-            throw new Error('Canvas to Blob conversion failed');
+          if (!blob) {
+            showFailure(new Error('Canvas to Blob conversion failed'));
+            return;
           }
+          if(resizedImageUrl) URL.revokeObjectURL(resizedImageUrl);
+          // Browsers fall back to PNG for formats they can't encode, such as GIF.
+          setResizedExtension(blob.type === originalFile.type ? '' : blob.type.split('/')[1]);
+          setResizedImageUrl(URL.createObjectURL(blob));
           setIsResizing(false);
         }, originalFile.type);
       } catch (error) {
-        console.error("Image resizing failed:", error);
-        toast({
-          title: 'Resizing Failed',
-          description: 'An error occurred while resizing the image.',
-          variant: 'destructive',
-        });
-        setIsResizing(false);
+        showFailure(error);
       }
     };
+    img.src = originalImageUrl!;
   };
 
   const resetState = () => {
-    if(originalImageUrl) URL.revokeObjectURL(originalImageUrl);
     if(resizedImageUrl) URL.revokeObjectURL(resizedImageUrl);
 
     setOriginalFile(null);
@@ -130,7 +136,7 @@ export function ImageResizer() {
     if(!originalFile) return '';
     const nameParts = originalFile.name.split('.');
     const ext = nameParts.pop();
-    return `${nameParts.join('.')}_${width}x${height}.${ext}`;
+    return `${nameParts.join('.')}_${width}x${height}.${resizedExtension || ext}`;
   }
 
   return (
@@ -141,14 +147,7 @@ export function ImageResizer() {
       </CardHeader>
       <CardContent>
         {!originalFile ? (
-          <div 
-            className="border border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted transition-colors bg-muted/50"
-            onClick={() => document.getElementById('file-upload')?.click()}
-          >
-            <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-            <p className="mt-4 text-muted-foreground">Drag & drop your image here, or click to browse</p>
-            <input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-          </div>
+          <FileDropzone accept="jpg,jpeg,png,webp,gif,bmp,avif" multiple={false} onFiles={([file]) => handleFile(file)} />
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">

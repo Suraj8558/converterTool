@@ -1,24 +1,39 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { toolCategories } from '@/lib/tools';
 
 export default function Footer() {
   return (
     <footer className="bg-background/80 border-t mt-16">
       <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
-              <Logo width={32} height={28} />
-              <span className="font-bold font-headline">tools.typingSnap</span>
+              <Logo />
+              <span className="font-bold font-headline">Converter Tool</span>
             </Link>
             <p className="text-sm text-muted-foreground mt-2">
               All-in-one file conversion and productivity tools.
             </p>
           </div>
+          {toolCategories.map((category) => (
+            <div key={category.name}>
+              <h3 className="font-semibold font-headline text-sm">{category.name}</h3>
+              <ul className="mt-3 space-y-2">
+                {category.tools.map((tool) => (
+                  <li key={tool.href}>
+                    <Link href={tool.href} className="text-sm text-muted-foreground hover:text-foreground">
+                      {tool.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
         <div className="mt-12 border-t pt-8 flex flex-col items-center justify-between md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} tools.typingSnap. All rights reserved.
+            &copy; {new Date().getFullYear()} Converter Tool. All rights reserved.
           </p>
           <div className="flex mt-4 md:mt-0 space-x-6">
             <Link href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">

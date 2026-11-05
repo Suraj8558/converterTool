@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy - tools.typingSnap',
-  description: 'Read the Privacy Policy for using tools.typingSnap tools.',
-};
+export const metadata: Metadata = pageMetadata(
+  'Privacy Policy - Converter Tool',
+  'Read the Privacy Policy for using Converter Tool.',
+  '/privacy'
+);
 
 export default function PrivacyPage() {
   return (
@@ -15,31 +17,26 @@ export default function PrivacyPage() {
           <CardTitle className="text-3xl font-bold font-headline">Privacy Policy</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 text-muted-foreground">
-          <p>Last updated: July 29, 2024</p>
-          
+          <p>Last updated: November 5, 2026</p>
+
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">1. Information We Collect</h2>
-              <p>We do not collect any personal information from our users. We do not require you to create an account or provide any personal data to use our services.</p>
+              <p>You do not need an account or need to give us personal data to use our tools. Like most websites, our hosting provider may process technical request data, such as your IP address and browser type, to deliver the site. If you email us, we receive your email address and whatever you include in your message.</p>
           </div>
-          
+
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">2. File Handling</h2>
-              <p>When you upload a file for conversion, it is temporarily stored on our servers to perform the conversion. We are committed to the security and privacy of your files.</p>
-              <ul className="list-disc list-inside space-y-1 mt-2 pl-4">
-                  <li>Files are automatically and permanently deleted from our servers a few hours after the conversion is complete.</li>
-                  <li>We do not access, copy, or analyze your files in any way. The process is fully automated.</li>
-                  <li>All connections to our servers are encrypted using SSL.</li>
-              </ul>
+              <p>Our tools process your files directly in your browser. Your files are not uploaded to our servers, and we never receive or store them.</p>
           </div>
 
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">3. Cookies and Analytics</h2>
-              <p>We use minimal, privacy-focused analytics to understand how our website is used and to improve our services. This data is aggregated and anonymous. We do not use tracking cookies for advertising purposes.</p>
+              <p>We use Google Tag Manager to load analytics tools that help us understand how the site is used. Through these tools, Google may receive information about your device and visit, including your IP address, and cookies may be set in your browser. Your light or dark theme choice is stored in your browser and is not sent to us.</p>
           </div>
-          
+
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">4. Third-Party Services</h2>
-              <p>We do not share your files or any data with third-party services, except as required for the technical operation of the site (e.g., our hosting provider).</p>
+              <p>We use a hosting provider to run this site and Google for the analytics described above. These services handle data under their own privacy policies. Your files are never shared with them because they stay in your browser.</p>
           </div>
 
           <div>

@@ -1,17 +1,13 @@
-import { ComingSoon } from '@/components/coming-soon';
+import { PdfSplit } from '@/components/pdf-split';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'PDF Split - tools.typingSnap',
-  description: 'Split a single PDF into multiple files by page ranges.',
-};
+export const metadata: Metadata = pageMetadata(
+  'PDF Split - Converter Tool',
+  'Extract page ranges from a PDF or split it into single pages.',
+  '/pdf-split'
+);
 
 export default function PdfSplitPage() {
-  return (
-    <ComingSoon
-      title="PDF Split"
-      description="Extract pages or a large PDF into multiple smaller files."
-      reason="Splitting PDFs involves complex manipulation of the PDF cross-reference table and objects. This feature is not yet available but is coming soon."
-    />
-  );
+  return <PdfSplit />;
 }

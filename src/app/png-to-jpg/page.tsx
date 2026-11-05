@@ -1,10 +1,12 @@
 import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'PNG to JPG Converter - tools.typingSnap',
-  description: 'Easily and quickly convert your PNG images to high-quality JPG format for free.',
-};
+export const metadata: Metadata = pageMetadata(
+  'PNG to JPG Converter - Converter Tool',
+  'Easily and quickly convert your PNG images to high-quality JPG format for free.',
+  '/png-to-jpg'
+);
 
 export default function PngToJpgPage() {
   return (

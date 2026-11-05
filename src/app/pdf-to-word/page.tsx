@@ -1,17 +1,21 @@
-import { ComingSoon } from '@/components/coming-soon';
+import { Converter } from '@/components/converter';
 import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/site';
 
-export const metadata: Metadata = {
-  title: 'PDF to Word Converter - tools.typingSnap',
-  description: 'Convert PDF files to editable Microsoft Word documents.',
-};
+export const metadata: Metadata = pageMetadata(
+  'PDF to Word Converter - Converter Tool',
+  'Convert PDF documents to editable Word (.docx) files.',
+  '/pdf-to-word'
+);
 
 export default function PdfToWordPage() {
   return (
-    <ComingSoon
+    <Converter
       title="PDF to Word Converter"
-      description="Turn static PDFs into fully editable Microsoft Word documents."
-      reason="Accurately extracting structured text, tables, and formatting from a PDF into a DOCX file requires complex server-side parsing. This feature is not yet available but is coming soon."
+      description="Extract the text of a PDF into an editable .docx file. Images, tables and exact layout are not kept, and scanned PDFs are not supported."
+      fromType="pdf"
+      toType="docx"
+      engine="pdf-to-docx"
     />
   );
 }
