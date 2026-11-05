@@ -37,6 +37,7 @@ The tests build the site and start it on port 9130, with placeholder values for 
 |---|---|
 | `e2e/converters.spec.ts` | Standard converters, zip downloads, drag and drop, wrong file types, error messages |
 | `e2e/tools.spec.ts` | PDF Merge, Split and Compress, Images to PDF, Image Compressor and Resizer |
+| `e2e/pdf-edit.spec.ts` | Organize, Rotate, Crop, Page Numbers, Watermark, PDF to JPG and the Images to PDF page options, including sideways pages |
 | `e2e/site.spec.ts` | Menus, search, keyboard access, dark mode, contact form, SEO tags, and that files aren't uploaded |
 
 Tests download each result and check its contents, such as page counts, file signatures and image sizes, rather than only checking for a success message.

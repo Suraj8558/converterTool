@@ -17,7 +17,11 @@
 - **Merge PDFs** — combine multiple PDF files into one
 - **Split PDFs** — extract specific pages from a PDF
 - **Compress PDFs** — shrink a PDF, optionally rebuilding its pages as images
-- **Images to PDF** — combine JPG, PNG and WebP images into one PDF
+- **Images to PDF** — combine JPG, PNG and WebP images into one PDF, with page size and margin options
+- **Organize PDFs** — reorder, remove or add pages
+- **Rotate and Crop PDFs** — turn pages, or keep just the area you need
+- **Page Numbers and Watermarks** — stamp numbers, text or images on every page
+- **PDF to JPG** — save each page as an image
 - **PDF to Word** — extract PDF text into an editable .docx (no images, tables or scanned PDFs)
 - **Word to PDF** — convert .docx documents to PDF (Latin, Greek and Cyrillic text)
 - **EPUB → MOBI** — convert unprotected e-books for older e-readers

@@ -11,7 +11,9 @@ src/
 │   ├── converter.tsx    # The standard converter interface
 │   ├── file-dropzone.tsx    # Shared upload area
 │   ├── file-order-list.tsx  # Reorderable file list
-│   ├── pdf-*.tsx, images-to-pdf.tsx, image-*.tsx  # Tools with their own interface
+│   ├── tool-shell.tsx   # Card, result panel and error handling for custom tools
+│   ├── page-grid.tsx    # PDF page thumbnails
+│   ├── pdf-*.tsx, images-to-pdf.tsx, image-*.tsx, organize-pdf.tsx, rotate-pdf.tsx, crop-pdf.tsx  # Tools with their own interface
 │   ├── layout/          # Header, footer, tool menus
 │   └── ui/              # ShadCN components
 ├── lib/
@@ -51,6 +53,10 @@ Turbopack can't bundle FFmpeg's dynamic worker URL. Instead:
 ### PDF pages render with the `print` intent
 
 [`pdf-compress.ts`](../src/lib/conversions/pdf-compress.ts) uses `intent: 'print'` so that rendering doesn't depend on `requestAnimationFrame`, which pauses in background tabs. Without it, compression stalled in a hidden tab.
+
+### PDF positions use what's on screen
+
+A PDF page can carry a rotation flag, so its drawing coordinates may not match what a reader sees. [`pdf-geometry.ts`](../src/lib/conversions/pdf-geometry.ts) converts between the two, so page numbers, watermarks and crops land where the visitor expects on sideways pages.
 
 ### Check what the browser really produced
 
@@ -93,7 +99,7 @@ Turbopack can't bundle FFmpeg's dynamic worker URL. Instead:
 
 ### A tool with its own interface
 
-Build a client component in `src/components/`, reusing `FileDropzone`. See [`pdf-split.tsx`](../src/components/pdf-split.tsx) for an example. Its page then renders that component instead of `Converter`, and steps 4 and 5 are the same.
+Build a client component in `src/components/`, reusing `FileDropzone` and the helpers in `tool-shell.tsx`. See [`rotate-pdf.tsx`](../src/components/rotate-pdf.tsx) for an example. Its page then renders that component instead of `Converter`, and steps 4 and 5 are the same.
 
 ## Tech stack
 

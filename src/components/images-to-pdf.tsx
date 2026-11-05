@@ -7,13 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { FileDropzone } from '@/components/file-dropzone';
 import { FileOrderList } from '@/components/file-order-list';
 import { useToast } from '@/hooks/use-toast';
-import { imagesToPdf } from '@/lib/conversions/images-to-pdf';
+import { Label } from '@/components/ui/label';
+import { selectClass } from '@/components/tool-shell';
+import { defaultImageOptions, imagesToPdf, type ImagesToPdfOptions } from '@/lib/conversions/images-to-pdf';
 
 export function ImagesToPdf() {
   const [files, setFiles] = useState<File[]>([]);
   const [isConverting, setIsConverting] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [options, setOptions] = useState<ImagesToPdfOptions>(defaultImageOptions);
   const { toast } = useToast();
+
+  const setOption = (name: keyof ImagesToPdfOptions, value: string) =>
+    setOptions((current) => ({ ...current, [name]: value }));
 
   useEffect(() => {
     if (!resultUrl) return;
@@ -23,7 +29,7 @@ export function ImagesToPdf() {
   const handleConvert = async () => {
     setIsConverting(true);
     try {
-      setResultUrl(URL.createObjectURL(await imagesToPdf(files)));
+      setResultUrl(URL.createObjectURL(await imagesToPdf(files, options)));
     } catch (error) {
       console.error('Images to PDF failed:', error);
       toast({
@@ -69,6 +75,37 @@ export function ImagesToPdf() {
             <>
               <FileDropzone accept="jpg,jpeg,png,webp" onFiles={(added) => setFiles((current) => [...current, ...added])} />
               {files.length > 0 && <FileOrderList title="Page order:" files={files} onChange={setFiles} />}
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="page-size">Page size</Label>
+                  <select id="page-size" className={selectClass} value={options.pageSize} onChange={(event) => setOption('pageSize', event.target.value)}>
+                    <option value="fit">Same as image</option>
+                    <option value="a4">A4</option>
+                    <option value="letter">US Letter</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="page-orientation">Orientation</Label>
+                  <select
+                    id="page-orientation"
+                    className={selectClass}
+                    value={options.orientation}
+                    disabled={options.pageSize === 'fit'}
+                    onChange={(event) => setOption('orientation', event.target.value)}
+                  >
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="page-margin">Margin</Label>
+                  <select id="page-margin" className={selectClass} value={options.margin} onChange={(event) => setOption('margin', event.target.value)}>
+                    <option value="none">None</option>
+                    <option value="small">Small</option>
+                    <option value="big">Big</option>
+                  </select>
+                </div>
+              </div>
               <Button
                 onClick={handleConvert}
                 disabled={files.length === 0 || isConverting}

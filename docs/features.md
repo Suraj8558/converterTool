@@ -1,6 +1,6 @@
 # Features
 
-Converter Tool has 20 tools. They all run in the visitor's browser, so files are never uploaded.
+Converter Tool has 26 tools. They all run in the visitor's browser, so files are never uploaded.
 
 **How every tool behaves:**
 
@@ -89,6 +89,12 @@ Handles one image at a time, with a quality slider from 10% to 100% (default 80%
 | [PDF Split](#pdf-split) | `/pdf-split` | 1 `.pdf` | `.pdf` or `.zip` |
 | [PDF Compress](#pdf-compress) | `/pdf-compress` | 1 `.pdf` | `.pdf` |
 | [Images to PDF](#images-to-pdf) | `/images-to-pdf` | `.jpg`, `.jpeg`, `.png`, `.webp` | `images.pdf` |
+| [Organize PDF](#organize-pdf) | `/organize-pdf` | 1 or more `.pdf` | `.pdf` |
+| [Rotate PDF](#rotate-pdf) | `/rotate-pdf` | 1 `.pdf` | `.pdf` |
+| [Crop PDF](#crop-pdf) | `/crop-pdf` | 1 `.pdf` | `.pdf` |
+| [Add Page Numbers](#add-page-numbers) | `/pdf-page-numbers` | 1 `.pdf` | `.pdf` |
+| [Add Watermark](#add-watermark) | `/pdf-watermark` | 1 `.pdf`, plus `.png` or `.jpg` for an image | `.pdf` |
+| [PDF to JPG](#pdf-to-jpg) | `/pdf-to-jpg` | 1 `.pdf` | `.jpg` or `.zip` |
 | [Word to PDF](#word-to-pdf) | `/word-to-pdf` | `.docx` | `.pdf` |
 | [PDF to Word](#pdf-to-word) | `/pdf-to-word` | `.pdf` | `.docx` |
 | [EPUB to MOBI](#epub-to-mobi) | `/epub-to-mobi` | `.epub` | `.mobi` |
@@ -121,9 +127,43 @@ If the result isn't smaller, the tool says so and offers no download, because th
 
 Creates a PDF with one image per page, in an order the visitor can change.
 
-- Each page is sized to its image, not to A4.
+- **Page size:** the same as the image (default), A4 or US Letter. On A4 and Letter, the image is scaled to fit and centered without distortion, which can enlarge small images.
+- **Orientation:** portrait or landscape, for A4 and Letter.
+- **Margin:** none, small or big.
 - Phone photos stay upright, because rotation data is applied.
 - JPGs are re-saved at 92% quality. Other formats are stored as PNG, keeping transparency.
+
+### Organize PDF
+
+Shows a thumbnail of every page. Pages can be dragged into place or moved with the arrow buttons, removed, or added from more PDFs. The original files aren't changed.
+
+- Dragging uses a mouse. On a touchscreen, use the arrow buttons.
+- Thumbnails load one at a time, so a very long PDF takes a while to appear in full.
+- Password-protected PDFs are refused.
+
+### Rotate PDF
+
+Turns single pages or all of them, with a preview. The turn adds to any rotation a page already has. Password-protected PDFs are refused.
+
+### Crop PDF
+
+Choose the area to keep by dragging across a preview or typing margins as percentages, then apply it to all pages or the current one. At least 5% of the page must remain in each direction.
+
+**Important:** cropping only hides content. Anyone with a PDF editor can bring it back, so don't use this to remove private information. The page says so too.
+
+### Add Page Numbers
+
+Offers six positions, `1, 2, 3` or `Page 1 of 3` formats, a starting number, and text sizes from 6 to 72. Numbers stay upright and correctly placed on sideways pages.
+
+### Add Watermark
+
+Stamps text or a PNG or JPG image on every page, with a position and an opacity from 5% to 100%. A centered watermark can tilt across the page.
+
+**Limit:** watermark text supports Latin characters only, so other scripts show an error suggesting an image watermark. Numbers and the "Page of" wording in Add Page Numbers aren't affected.
+
+### PDF to JPG
+
+Saves each page as a JPG at 150 or 300 DPI. One page downloads as a `.jpg`, and several as a `.zip`. It renders whole pages and doesn't extract the images inside a PDF.
 
 ### Word to PDF
 

@@ -1,4 +1,4 @@
-import { ArrowRightLeft, BookOpen, Combine, FileAudio, FileImage, FileText, FileVideo, ImageIcon, Clapperboard, Scissors, Shrink } from 'lucide-react';
+import { ArrowRightLeft, BookOpen, Clapperboard, Combine, Crop, FileAudio, FileImage, FileText, FileVideo, Hash, ImageIcon, LayoutGrid, RotateCw, Scissors, Shrink, Stamp } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -42,6 +42,12 @@ export const toolCategories: ToolCategory[] = [
       { name: 'PDF Split', href: '/pdf-split', description: 'Extract page ranges or split a PDF into single pages.', icon: <Scissors className="w-6 h-6"/> },
       { name: 'PDF Compress', href: '/pdf-compress', description: 'Reduce the file size of a PDF.', icon: <Shrink className="w-6 h-6"/> },
       { name: 'Images to PDF', href: '/images-to-pdf', description: 'Combine JPG, PNG and WebP images into one PDF.', icon: <FileImage className="w-6 h-6"/> },
+      { name: 'Organize PDF', href: '/organize-pdf', description: 'Reorder, remove or add pages in a PDF.', icon: <LayoutGrid className="w-6 h-6"/> },
+      { name: 'Rotate PDF', href: '/rotate-pdf', description: 'Turn one page or the whole document.', icon: <RotateCw className="w-6 h-6"/> },
+      { name: 'Crop PDF', href: '/crop-pdf', description: 'Keep just the part of a page you need.', icon: <Crop className="w-6 h-6"/> },
+      { name: 'Add Page Numbers', href: '/pdf-page-numbers', description: 'Number every page of a PDF.', icon: <Hash className="w-6 h-6"/> },
+      { name: 'Add Watermark', href: '/pdf-watermark', description: 'Stamp text or an image across every page.', icon: <Stamp className="w-6 h-6"/> },
+      { name: 'PDF to JPG', href: '/pdf-to-jpg', description: 'Save each page of a PDF as a JPG image.', icon: <FileImage className="w-6 h-6"/> },
       { name: 'Word to PDF', href: '/word-to-pdf', description: 'Convert .docx documents to PDF.', icon: <FileText className="w-6 h-6"/> },
       { name: 'PDF to Word', href: '/pdf-to-word', description: 'Extract the text of a PDF into an editable .docx file.', icon: <FileText className="w-6 h-6"/> },
       { name: 'EPUB to MOBI', href: '/epub-to-mobi', description: 'Convert unprotected e-books for older e-readers.', icon: <BookOpen className="w-6 h-6"/> },
