@@ -1,7 +1,7 @@
 'use client';
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
-import { Download, IdCard, ImagePlus, Loader2, RotateCcw } from 'lucide-react';
+import { Download, IdCard, ImagePlus, Loader2, RotateCcw, ScanFace, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FileDropzone } from '@/components/file-dropzone';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,9 @@ import { Switch } from '@/components/ui/switch';
 import { ToolCard, baseName, primaryButtonClass, selectClass, useToolError } from '@/components/tool-shell';
 import {
   PHOTO_SIZES,
+  MAX_ZOOM,
   SHEET_SIZES,
+  alignToFace,
   defaultCrop,
   drawPhoto,
   maxCopies,
@@ -23,8 +25,11 @@ import {
   type PassportOptions,
 } from '@/lib/conversions/passport-photo';
 import {
+  autoAdjustments,
   composePhoto,
+  findFace,
   findPerson,
+  isAdjusted,
   noAdjustments,
   workingCanvas,
   type Adjustments,
@@ -40,6 +45,17 @@ const BACKGROUND_COLORS = [
   { label: 'Blue', value: '#3d7fd1' },
   { label: 'Red', value: '#d63a3a' },
 ];
+
+// Online visa and passport forms often cap the photo's file size.
+const SIZE_LIMITS = [
+  { label: 'No limit', kb: 0 },
+  { label: 'Under 50 KB', kb: 50 },
+  { label: 'Under 100 KB', kb: 100 },
+  { label: 'Under 200 KB', kb: 200 },
+  { label: 'Under 500 KB', kb: 500 },
+];
+
+const formatSize = (bytes: number) => (bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`);
 
 const PREVIEW_WIDTH = 240;
 const KEY_STEP = 0.02;
@@ -85,6 +101,8 @@ export function PassportPhoto() {
   const [useBackdropImage, setUseBackdropImage] = useState(false);
   const [adjustments, setAdjustments] = useState<Adjustments>(noAdjustments);
 
+  const [isAligning, setIsAligning] = useState(false);
+  const [sizeLimitKb, setSizeLimitKb] = useState(0);
   const [copies, setCopies] = useState<number | ''>(6);
   const [cutLines, setCutLines] = useState(true);
   const [made, setMade] = useState<{ key: string; outputs: Output[] } | null>(null);
@@ -114,7 +132,7 @@ export function PassportPhoto() {
   // Downloads stay on screen only while they match the current settings.
   const settingsKey = JSON.stringify([
     imageVersion, photoId, sheetId, crop, copyCount, cutLines,
-    removeBackground, showingImage ? backdropImage.id : color, adjustments,
+    removeBackground, showingImage ? backdropImage.id : color, adjustments, sizeLimitKb,
   ]);
   const outputs = made?.key === settingsKey ? made.outputs : [];
 
@@ -166,6 +184,43 @@ export function PassportPhoto() {
       if (removeBackground) void detectPerson(canvas, version);
     } catch {
       showError(new Error(`"${selected.name}" could not be read as an image.`));
+    }
+  };
+
+  /** Picks brightness and contrast from the photo itself, judging only the person when known. */
+  const handleAutoEnhance = () => {
+    if (!base) return;
+    const pixels = base.getContext('2d')?.getImageData(0, 0, base.width, base.height);
+    if (!pixels) return;
+
+    let weights: Uint8ClampedArray | undefined;
+    if (personMask) {
+      // The mask can be smaller than the photo, so look up each pixel's place in it.
+      weights = new Uint8ClampedArray(base.width * base.height);
+      for (let y = 0; y < base.height; y++) {
+        const maskRow = Math.min(personMask.height - 1, Math.floor((y / base.height) * personMask.height)) * personMask.width;
+        for (let x = 0; x < base.width; x++) {
+          weights[y * base.width + x] = personMask.alpha[maskRow + Math.min(personMask.width - 1, Math.floor((x / base.width) * personMask.width))];
+        }
+      }
+    }
+    setAdjustments((current) => ({ ...current, ...autoAdjustments(pixels.data, weights) }));
+  };
+
+  const handleAlignFace = async () => {
+    if (!base) return;
+    setIsAligning(true);
+    try {
+      const face = await findFace(base);
+      if (!face) {
+        showError(new Error('No face was found. Use a photo where you face the camera, or position it by hand.'));
+        return;
+      }
+      setCrop(alignToFace(base, aspect, face));
+    } catch (error) {
+      showError(error);
+    } finally {
+      setIsAligning(false);
     }
   };
 
@@ -238,7 +293,10 @@ export function PassportPhoto() {
     try {
       // Build from the latest settings, not the preview's possibly lagging copy.
       const finished = composePhoto(base, adjustments, backdrop, personMask);
-      const options: PassportOptions = { photo, sheet, copies: copyCount, crop, background: color, cutLines };
+      const options: PassportOptions = {
+        photo, sheet, copies: copyCount, crop, background: color, cutLines,
+        maxBytes: sizeLimitKb ? sizeLimitKb * 1024 : undefined,
+      };
       const name = `${baseName(file)}_passport`;
       const [single, sheetJpg, sheetPdf] = await Promise.all([
         renderSinglePhoto(finished, options),
@@ -248,7 +306,7 @@ export function PassportPhoto() {
       setMade({
         key: settingsKey,
         outputs: [
-          { label: 'Single Photo (JPG)', name: `${name}.jpg`, url: URL.createObjectURL(single) },
+          { label: `Single Photo (JPG, ${formatSize(single.size)})`, name: `${name}.jpg`, url: URL.createObjectURL(single) },
           { label: 'Print Sheet (PDF)', name: `${name}_sheet.pdf`, url: URL.createObjectURL(sheetPdf) },
           { label: 'Print Sheet (JPG)', name: `${name}_sheet.jpg`, url: URL.createObjectURL(sheetJpg) },
         ],
@@ -321,12 +379,16 @@ export function PassportPhoto() {
                 <Slider
                   aria-labelledby="zoom-label"
                   min={1}
-                  max={4}
+                  max={MAX_ZOOM}
                   step={0.05}
                   value={[crop.zoom]}
                   onValueChange={([zoom]) => setCrop((current) => ({ ...current, zoom }))}
                 />
               </div>
+              <Button type="button" variant="outline" onClick={handleAlignFace} disabled={isAligning}>
+                {isAligning ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ScanFace className="mr-2 h-4 w-4" />}
+                {isAligning ? 'Finding your face...' : 'Auto-align my face'}
+              </Button>
             </Section>
 
             <Section title="Background">
@@ -411,6 +473,17 @@ export function PassportPhoto() {
             </Section>
 
             <Section title="Adjust">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button type="button" variant="outline" onClick={handleAutoEnhance} disabled={waitingForMask}>
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Auto-enhance
+                </Button>
+                {isAdjusted(adjustments) && (
+                  <Button type="button" variant="link" className="h-auto p-0" onClick={() => setAdjustments(noAdjustments)}>
+                    Reset all adjustments
+                  </Button>
+                )}
+              </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-3">
                   <Label id="brightness-label">Brightness: {signed(adjustments.brightness)}</Label>
@@ -420,12 +493,18 @@ export function PassportPhoto() {
                   <Label id="contrast-label">Contrast: {signed(adjustments.contrast)}</Label>
                   <Slider aria-labelledby="contrast-label" min={-50} max={50} step={1} value={[adjustments.contrast]} onValueChange={setAdjustment('contrast')} />
                 </div>
+                <div className="space-y-3">
+                  <Label id="saturation-label">Colour: {signed(adjustments.saturation)}</Label>
+                  <Slider aria-labelledby="saturation-label" min={-100} max={100} step={1} value={[adjustments.saturation]} onValueChange={setAdjustment('saturation')} />
+                </div>
+                <div className="space-y-3">
+                  <Label id="rotation-label">Straighten: {adjustments.rotation > 0 ? '+' : ''}{adjustments.rotation.toFixed(1)}°</Label>
+                  <Slider aria-labelledby="rotation-label" min={-15} max={15} step={0.5} value={[adjustments.rotation]} onValueChange={setAdjustment('rotation')} />
+                </div>
               </div>
-              {(adjustments.brightness !== 0 || adjustments.contrast !== 0) && (
-                <Button type="button" variant="link" className="h-auto p-0" onClick={() => setAdjustments(noAdjustments)}>
-                  Reset brightness and contrast
-                </Button>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Passport offices want natural colours and a level head. Don&apos;t over-edit: heavy changes can get a photo rejected.
+              </p>
             </Section>
 
             <Section title="Print">
@@ -452,6 +531,15 @@ export function PassportPhoto() {
                     }}
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="size-limit">Single photo file size</Label>
+                <select id="size-limit" className={selectClass} value={sizeLimitKb} onChange={(event) => setSizeLimitKb(Number(event.target.value))}>
+                  {SIZE_LIMITS.map((limit) => (
+                    <option key={limit.kb} value={limit.kb}>{limit.label}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">For online forms with an upload limit. The size of the photo itself stays the same; only the JPG quality is lowered.</p>
               </div>
               <div className="flex items-center gap-2">
                 <Switch id="cut-lines" checked={cutLines} onCheckedChange={setCutLines} />

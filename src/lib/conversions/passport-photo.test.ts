@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cropRect, layoutSheet, maxCopies, mmToPx, panCrop, PHOTO_SIZES, SHEET_SIZES } from './passport-photo';
+import { alignToFace, cropRect, layoutSheet, maxCopies, mmToPx, panCrop, PHOTO_SIZES, SHEET_SIZES, searchQuality } from './passport-photo';
 
 const size = (id: string) => PHOTO_SIZES.find((photo) => photo.id === id)!;
 const sheet = (id: string) => SHEET_SIZES.find((paper) => paper.id === id)!;
@@ -90,5 +90,72 @@ describe('layoutSheet', () => {
   it('centres a partial row', () => {
     const layout = layoutSheet(size('in'), sheet('a4'), 1);
     expect(layout.slots[0].x).toBeCloseTo((layout.widthMm - 35) / 2);
+  });
+});
+
+describe('alignToFace', () => {
+  const image = { width: 2000, height: 3000 };
+  const aspect = 35 / 45;
+  const face = { x: 800, y: 900, width: 400, height: 500 };
+
+  it('centres the crop on the face sideways', () => {
+    expect(alignToFace(image, aspect, face).centerX).toBeCloseTo(0.5);
+  });
+
+  it('puts the chin on the lower guide line and the head top on the upper one', () => {
+    const crop = alignToFace(image, aspect, face);
+    const rect = cropRect(image, aspect, crop);
+    const chin = face.y + face.height * 0.78;
+    expect((chin - rect.y) / rect.height).toBeCloseTo(0.78, 2);
+    expect((chin - face.height * 1.27 - rect.y) / rect.height).toBeCloseTo(0.12, 2);
+  });
+
+  it('zooms in more for a smaller face', () => {
+    const small = alignToFace(image, aspect, { ...face, width: 160, height: 200 });
+    expect(small.zoom).toBeGreaterThan(alignToFace(image, aspect, face).zoom);
+  });
+
+  it('never zooms out past the whole picture or in past the limit', () => {
+    expect(alignToFace(image, aspect, { x: 0, y: 0, width: 2000, height: 3000 }).zoom).toBe(1);
+    expect(alignToFace(image, aspect, { x: 900, y: 900, width: 10, height: 10 }).zoom).toBe(4);
+  });
+
+  it('keeps the crop inside the picture for a face near the edge', () => {
+    const rect = cropRect(image, aspect, alignToFace(image, aspect, { x: 0, y: 0, width: 300, height: 400 }));
+    expect(rect.x).toBeGreaterThanOrEqual(0);
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('searchQuality', () => {
+  // A pretend encoder whose files grow in proportion to quality.
+  const encoder = (bytesAtFullQuality: number) => {
+    const tried: number[] = [];
+    return {
+      tried,
+      encode: async (quality: number) => {
+        tried.push(quality);
+        return { size: Math.round(quality * bytesAtFullQuality), quality };
+      },
+    };
+  };
+
+  it('keeps the best quality when it already fits', async () => {
+    const { encode, tried } = encoder(50_000);
+    const result = await searchQuality(encode, 100_000);
+    expect(result?.quality).toBe(0.95);
+    expect(tried).toEqual([0.95]);
+  });
+
+  it('finds the highest quality that fits', async () => {
+    const { encode } = encoder(100_000);
+    const result = await searchQuality(encode, 60_000);
+    expect(result!.size).toBeLessThanOrEqual(60_000);
+    expect(result!.size).toBeGreaterThan(58_000);
+  });
+
+  it('gives up when even the lowest quality is too big', async () => {
+    const { encode } = encoder(1_000_000);
+    expect(await searchQuality(encode, 100_000)).toBeNull();
   });
 });

@@ -1,6 +1,6 @@
 // Puts the background-removal engine in public/ so the passport photo tool runs from
-// this site. The engine is copied from node_modules; the 16 MB person-segmentation model
-// is downloaded once from Google. Both are generated, not committed.
+// this site. The engine is copied from node_modules; the person-segmentation (16 MB) and
+// face-detection (0.2 MB) models are downloaded once from Google. Both are generated, not committed.
 import { cpSync, existsSync, mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,19 +19,24 @@ for (const file of [
   cpSync(join(wasm, file), join(target, file));
 }
 
-const MODEL = 'selfie_multiclass_256x256.tflite';
-const MODEL_URL = `https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/${MODEL}`;
-const modelPath = join(target, MODEL);
+const MODELS = {
+  'selfie_multiclass_256x256.tflite':
+    'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
+  'blaze_face_short_range.tflite':
+    'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite',
+};
 
-if (!existsSync(modelPath)) {
+for (const [name, url] of Object.entries(MODELS)) {
+  const modelPath = join(target, name);
+  if (existsSync(modelPath)) continue;
   try {
-    const response = await fetch(MODEL_URL);
+    const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     // Write to a temporary name first so an interrupted download is never mistaken for the model.
     writeFileSync(`${modelPath}.part`, Buffer.from(await response.arrayBuffer()));
     renameSync(`${modelPath}.part`, modelPath);
   } catch (error) {
     // Not fatal: the page then loads the model from Google when it's first needed.
-    console.warn(`Could not download ${MODEL} (${error.message}). The site will fetch it from Google instead.`);
+    console.warn(`Could not download ${name} (${error.message}). The site will fetch it from Google instead.`);
   }
 }
