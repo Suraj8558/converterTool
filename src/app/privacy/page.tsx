@@ -26,7 +26,8 @@ export default function PrivacyPage() {
 
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">2. File Handling</h2>
-              <p>Our tools process your files directly in your browser. Your files are not uploaded to our servers, and we never receive or store them.</p>
+              <p>Our tools process your files directly in your browser. Your files are not uploaded to our servers, and we never receive or store them. This includes photos you use in the Passport Photo Maker: cropping, background removal, brightness and contrast changes, and the print sheets are all created on your device.</p>
+              <p className="mt-2">Background removal uses a small machine-learning model that runs in your browser. The model file is downloaded to your device, not your photo to us. It is normally served from this site. If that copy is unavailable, your browser downloads it from Google&apos;s servers instead, which means Google can see your IP address and browser details for that download, but never your photo.</p>
           </div>
 
           <div>
@@ -36,7 +37,7 @@ export default function PrivacyPage() {
 
           <div>
               <h2 className="text-2xl font-semibold mt-6 mb-2 text-foreground">4. Third-Party Services</h2>
-              <p>We use a hosting provider to run this site and Google for the analytics described above. These services handle data under their own privacy policies. Your files are never shared with them because they stay in your browser.</p>
+              <p>We use a hosting provider to run this site and Google for the analytics described above and, only if needed, for downloading the background-removal model. These services handle data under their own privacy policies. Your files are never shared with them because they stay in your browser.</p>
           </div>
 
           <div>
