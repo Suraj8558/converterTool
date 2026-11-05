@@ -281,4 +281,25 @@ test.describe('Passport Photo Maker', () => {
     const { corner } = await decodeImage(page, bytes, 'image/jpeg');
     expect(near(corner, [120, 59, 237])).toBe(true); // pic.webp is a flat purple.
   });
+  test('keeps the single photo under the chosen file size', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByLabel('Single photo file size').selectOption('50');
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+
+    const link = page.getByRole('link', { name: /Download Single Photo/ });
+    await expect(link).toHaveText(/\d+ KB/, { timeout: WORK_TIMEOUT });
+    const { bytes } = await downloadFrom(page, /Download Single Photo/);
+    expect(bytes.length).toBeLessThanOrEqual(50 * 1024);
+    expect(await decodeImage(page, bytes, 'image/jpeg')).toMatchObject({ width: 413, height: 531 });
+  });
+
+  test('says so when there is no face to align', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByRole('button', { name: 'Auto-align my face' }).click();
+    await expect(page.getByText(/No face was found/).first()).toBeVisible({ timeout: WORK_TIMEOUT });
+    await expect(page.getByRole('button', { name: 'Auto-align my face' })).toBeEnabled();
+  });
 });

@@ -62,6 +62,10 @@ export interface CropState {
 
 export const defaultCrop: CropState = { zoom: 1, centerX: 0.5, centerY: 0.5 };
 
+
+/** The most the preview can zoom in. */
+export const MAX_ZOOM = 4;
+
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 /** The part of the source image that becomes the photo, kept inside the image. */
@@ -97,6 +101,75 @@ export function panCrop(
     centerX: (x + rect.width / 2) / image.width,
     centerY: (y + rect.height / 2) / image.height,
   };
+}
+
+/** A detected face, in pixels of the image it was found in. */
+export interface FaceBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+// Where the head sits in the finished photo, as fractions of its height. These match the
+// guide drawn over the preview: head top on the upper line, chin on the lower one.
+const HEAD_TOP = 0.12;
+const CHIN = 0.78;
+// The face detector's box is roughly square and reaches a little below the chin, so the
+// chin is found part-way up the box, and the whole head, hair included, is a bit taller
+// than the box. Measured on sample portraits.
+const CHIN_IN_BOX = 0.78;
+const HEAD_TO_FACE_HEIGHT = 1.27;
+
+/** Zoom and position that put a detected face where passport offices expect it. */
+export function alignToFace(image: { width: number; height: number }, aspect: number, face: FaceBox): CropState {
+  const headHeight = face.height * HEAD_TO_FACE_HEIGHT;
+  const cropHeight = headHeight / (CHIN - HEAD_TOP);
+  const chinY = face.y + face.height * CHIN_IN_BOX;
+  const cropTop = chinY - CHIN * cropHeight;
+
+  const fullHeight = cropRect(image, aspect, defaultCrop).height;
+  const zoom = clamp(fullHeight / cropHeight, 1, MAX_ZOOM);
+  return {
+    zoom,
+    centerX: (face.x + face.width / 2) / image.width,
+    // Centre of the crop; cropRect keeps it inside the image if the face is near an edge.
+    centerY: (cropTop + fullHeight / zoom / 2) / image.height,
+  };
+}
+
+/** Lowest JPG quality tried when squeezing a photo under a size limit. */
+const MIN_QUALITY = 0.3;
+const BEST_QUALITY = 0.95;
+
+/**
+ * Finds the best JPG quality whose file is no bigger than `maxBytes`: full quality if that
+ * fits, otherwise the highest quality found by halving the range. Returns null when even
+ * the lowest quality is too big.
+ */
+export async function searchQuality<T extends { size: number }>(
+  encode: (quality: number) => Promise<T>,
+  maxBytes: number
+): Promise<T | null> {
+  const best = await encode(BEST_QUALITY);
+  if (best.size <= maxBytes) return best;
+
+  let fitting = await encode(MIN_QUALITY);
+  if (fitting.size > maxBytes) return null;
+
+  let low = MIN_QUALITY;
+  let high = BEST_QUALITY;
+  for (let step = 0; step < 7; step++) {
+    const middle = (low + high) / 2;
+    const attempt = await encode(middle);
+    if (attempt.size <= maxBytes) {
+      fitting = attempt;
+      low = middle;
+    } else {
+      high = middle;
+    }
+  }
+  return fitting;
 }
 
 export interface SheetLayout {
@@ -195,6 +268,8 @@ export interface PassportOptions {
   background: string;
   /** Thin grey lines around each photo on the sheet, to guide the scissors. */
   cutLines: boolean;
+  /** Largest size, in bytes, for the single-photo JPG. Online forms often set one. */
+  maxBytes?: number;
 }
 
 export async function renderSinglePhoto(source: PhotoSource, options: PassportOptions): Promise<Blob> {
@@ -202,7 +277,15 @@ export async function renderSinglePhoto(source: PhotoSource, options: PassportOp
   const height = mmToPx(options.photo.heightMm);
   const { canvas, ctx } = newCanvas(width, height);
   drawPhoto(ctx, source, options.crop, { x: 0, y: 0, width, height }, options.background);
-  return canvasBlob(canvas, 'image/jpeg');
+
+  if (!options.maxBytes) return canvasBlob(canvas, 'image/jpeg');
+  const fitted = await searchQuality((quality) => canvasBlob(canvas, 'image/jpeg', quality), options.maxBytes);
+  if (!fitted) {
+    throw new Error(
+      `This photo can't be made smaller than ${Math.round(options.maxBytes / 1024)} KB without becoming blurry. Choose a larger limit.`
+    );
+  }
+  return fitted;
 }
 
 function renderSheetCanvas(source: PhotoSource, options: PassportOptions) {

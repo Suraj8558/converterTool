@@ -56,33 +56,93 @@ const MODEL_PATHS = [
   `https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/${MODEL_FILE}`,
 ];
 
+type Vision = typeof import('@mediapipe/tasks-vision');
+type Fileset = Awaited<ReturnType<Vision['FilesetResolver']['forVisionTasks']>>;
+
+let filesetPromise: Promise<{ vision: Vision; fileset: Fileset }> | null = null;
+
+function loadEngine() {
+  filesetPromise ??= (async () => {
+    const vision = await import('@mediapipe/tasks-vision');
+    return { vision, fileset: await vision.FilesetResolver.forVisionTasks(WASM_PATH) };
+  })().catch((error) => {
+    filesetPromise = null; // Let the next attempt try again, say after a network blip.
+    throw error;
+  });
+  return filesetPromise;
+}
+
+/** Tries each place a model could be served from, keeping the first that loads. */
+async function createFirstThatLoads<T>(paths: string[], create: (modelAssetPath: string) => Promise<T>): Promise<T> {
+  let lastError: unknown;
+  for (const path of paths) {
+    try {
+      return await create(path);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError;
+}
+
 type Segmenter = import('@mediapipe/tasks-vision').ImageSegmenter;
 let segmenterPromise: Promise<Segmenter> | null = null;
 
 function loadSegmenter(): Promise<Segmenter> {
   segmenterPromise ??= (async () => {
-    const { FilesetResolver, ImageSegmenter } = await import('@mediapipe/tasks-vision');
-    const fileset = await FilesetResolver.forVisionTasks(WASM_PATH);
-    let lastError: unknown;
-    for (const modelAssetPath of MODEL_PATHS) {
-      try {
-        return await ImageSegmenter.createFromOptions(fileset, {
-          baseOptions: { modelAssetPath, delegate: 'CPU' },
-          runningMode: 'IMAGE',
-          outputConfidenceMasks: true,
-          outputCategoryMask: false,
-        });
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw lastError;
+    const { vision, fileset } = await loadEngine();
+    return createFirstThatLoads(MODEL_PATHS, (modelAssetPath) =>
+      vision.ImageSegmenter.createFromOptions(fileset, {
+        baseOptions: { modelAssetPath, delegate: 'CPU' },
+        runningMode: 'IMAGE',
+        outputConfidenceMasks: true,
+        outputCategoryMask: false,
+      })
+    );
   })().catch((error) => {
-    segmenterPromise = null; // Let the next attempt try again, say after a network blip.
+    segmenterPromise = null;
     console.error('Background removal failed to load:', error);
     throw new Error('Background removal could not be loaded. Check your connection and try again.');
   });
   return segmenterPromise;
+}
+
+const FACE_MODEL_FILE = 'blaze_face_short_range.tflite';
+const FACE_MODEL_PATHS = [
+  `/mediapipe/${FACE_MODEL_FILE}`,
+  `https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/latest/${FACE_MODEL_FILE}`,
+];
+
+type Detector = import('@mediapipe/tasks-vision').FaceDetector;
+let detectorPromise: Promise<Detector> | null = null;
+
+function loadDetector(): Promise<Detector> {
+  detectorPromise ??= (async () => {
+    const { vision, fileset } = await loadEngine();
+    return createFirstThatLoads(FACE_MODEL_PATHS, (modelAssetPath) =>
+      vision.FaceDetector.createFromOptions(fileset, {
+        baseOptions: { modelAssetPath, delegate: 'CPU' },
+        runningMode: 'IMAGE',
+        minDetectionConfidence: 0.5,
+      })
+    );
+  })().catch((error) => {
+    detectorPromise = null;
+    console.error('Face detection failed to load:', error);
+    throw new Error('Face detection could not be loaded. Check your connection and try again.');
+  });
+  return detectorPromise;
+}
+
+/** Finds the largest face in the photo, or null if there isn't one. */
+export async function findFace(image: HTMLCanvasElement): Promise<{ x: number; y: number; width: number; height: number } | null> {
+  const detector = await loadDetector();
+  const boxes = detector
+    .detect(image)
+    .detections.flatMap((detection) => (detection.boundingBox ? [detection.boundingBox] : []));
+  if (boxes.length === 0) return null;
+  const largest = boxes.reduce((a, b) => (b.width * b.height > a.width * a.height ? b : a));
+  return { x: largest.originX, y: largest.originY, width: largest.width, height: largest.height };
 }
 
 /** Finds the person in the photo. The first call downloads the model. */
