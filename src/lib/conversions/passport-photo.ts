@@ -172,7 +172,7 @@ function canvasBlob(canvas: HTMLCanvasElement, type: string, quality = 0.95): Pr
  */
 export function drawPhoto(
   ctx: CanvasRenderingContext2D,
-  source: CanvasImageSource & { width: number; height: number },
+  source: PhotoSource,
   crop: CropState,
   target: Rect,
   background: string
@@ -184,6 +184,9 @@ export function drawPhoto(
   ctx.drawImage(source, rect.x, rect.y, rect.width, rect.height, target.x, target.y, target.width, target.height);
 }
 
+/** The finished photo before cropping: an image, or a canvas with edits applied. */
+export type PhotoSource = ImageBitmap | HTMLCanvasElement;
+
 export interface PassportOptions {
   photo: PhotoSize;
   sheet: SheetSize;
@@ -194,7 +197,7 @@ export interface PassportOptions {
   cutLines: boolean;
 }
 
-export async function renderSinglePhoto(source: ImageBitmap, options: PassportOptions): Promise<Blob> {
+export async function renderSinglePhoto(source: PhotoSource, options: PassportOptions): Promise<Blob> {
   const width = mmToPx(options.photo.widthMm);
   const height = mmToPx(options.photo.heightMm);
   const { canvas, ctx } = newCanvas(width, height);
@@ -202,7 +205,7 @@ export async function renderSinglePhoto(source: ImageBitmap, options: PassportOp
   return canvasBlob(canvas, 'image/jpeg');
 }
 
-function renderSheetCanvas(source: ImageBitmap, options: PassportOptions) {
+function renderSheetCanvas(source: PhotoSource, options: PassportOptions) {
   const layout = layoutSheet(options.photo, options.sheet, options.copies);
   if (layout.slots.length === 0) throw new Error('This photo size does not fit on the chosen paper.');
 
@@ -229,12 +232,12 @@ function renderSheetCanvas(source: ImageBitmap, options: PassportOptions) {
   return { canvas, layout };
 }
 
-export async function renderSheetJpg(source: ImageBitmap, options: PassportOptions): Promise<Blob> {
+export async function renderSheetJpg(source: PhotoSource, options: PassportOptions): Promise<Blob> {
   return canvasBlob(renderSheetCanvas(source, options).canvas, 'image/jpeg');
 }
 
 /** A PDF keeps the exact paper size, so printers don't rescale the photos. */
-export async function renderSheetPdf(source: ImageBitmap, options: PassportOptions): Promise<Blob> {
+export async function renderSheetPdf(source: PhotoSource, options: PassportOptions): Promise<Blob> {
   const { canvas, layout } = renderSheetCanvas(source, options);
   const jpg = new Uint8Array(await (await canvasBlob(canvas, 'image/jpeg')).arrayBuffer());
 

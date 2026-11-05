@@ -234,4 +234,51 @@ test.describe('Passport Photo Maker', () => {
     await expect(page.getByRole('link', { name: /Download Single Photo/ })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Create Passport Photos' })).toBeVisible();
   });
+  const near = (actual: number[], expected: number[], tolerance = 12) =>
+    actual.slice(0, 3).every((value, index) => Math.abs(value - expected[index]) <= tolerance);
+
+  test('darkens the photo with the brightness slider', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByRole('slider', { name: /Brightness/ }).focus();
+    await page.keyboard.press('Home');
+    await expect(page.getByText('Brightness: -50')).toBeVisible();
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+
+    const { bytes } = await downloadFrom(page, /Download Single Photo/);
+    const { corner } = await decodeImage(page, bytes, 'image/jpeg');
+    expect(near(corner, [191, 191, 191])).toBe(true);
+  });
+
+  test('replaces the background with a chosen colour', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await expect(page.getByRole('button', { name: 'Use an image' })).toHaveCount(0);
+    await page.getByLabel('Remove the original background').click();
+    await expect(page.getByRole('status').filter({ hasText: 'Removing background' })).toHaveCount(0, { timeout: WORK_TIMEOUT });
+    await page.getByRole('radio', { name: 'Red', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Use an image' })).toBeVisible();
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+
+    // No person in this picture, so all of it is background.
+    const { bytes } = await downloadFrom(page, /Download Single Photo/);
+    const { corner } = await decodeImage(page, bytes, 'image/jpeg');
+    expect(near(corner, [0xd6, 0x3a, 0x3a])).toBe(true);
+  });
+
+  test('puts an uploaded image behind the person', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByLabel('Remove the original background').click();
+    await expect(page.getByRole('status').filter({ hasText: 'Removing background' })).toHaveCount(0, { timeout: WORK_TIMEOUT });
+    await page.getByLabel('Background image', { exact: true }).setInputFiles(fixture('pic.webp'));
+    await expect(page.getByRole('radio', { name: /Background image pic\.webp/ })).toBeChecked();
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+
+    const { bytes } = await downloadFrom(page, /Download Single Photo/);
+    const { corner } = await decodeImage(page, bytes, 'image/jpeg');
+    expect(near(corner, [120, 59, 237])).toBe(true); // pic.webp is a flat purple.
+  });
 });

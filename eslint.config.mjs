@@ -5,7 +5,7 @@ const config = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    ignores: ['.next/**', 'public/ffmpeg/**', 'next-env.d.ts', 'test-results/**', 'playwright-report/**'],
+    ignores: ['.next/**', 'public/ffmpeg/**', 'public/mediapipe/**', 'next-env.d.ts', 'test-results/**', 'playwright-report/**'],
   },
 ];
 
