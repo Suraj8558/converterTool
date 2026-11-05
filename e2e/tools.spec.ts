@@ -191,3 +191,47 @@ test.describe('Image Resizer', () => {
     await expect(page.locator('input[type=file]')).toHaveCount(1);
   });
 });
+
+test.describe('Passport Photo Maker', () => {
+  test('makes a 35 × 45 mm photo and a printable sheet', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await expect(page.getByLabel('Copies (up to 6)')).toHaveValue('6');
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+
+    const single = await downloadFrom(page, /Download Single Photo/);
+    expect(single.name).toBe('photo_passport.jpg');
+    expect(await decodeImage(page, single.bytes, 'image/jpeg')).toMatchObject({ width: 413, height: 531 });
+
+    const sheet = await downloadFrom(page, /Download Print Sheet \(PDF\)/);
+    expect(sheet.name).toBe('photo_passport_sheet.pdf');
+    const pdf = await PDFDocument.load(sheet.bytes);
+    const { width, height } = pdf.getPage(0).getSize();
+    expect(width).toBeCloseTo(288, 0); // 4 in
+    expect(height).toBeCloseTo(432, 0); // 6 in
+
+    const jpg = await downloadFrom(page, /Download Print Sheet \(JPG\)/);
+    expect(await decodeImage(page, jpg.bytes, 'image/jpeg')).toMatchObject({ width: 1200, height: 1800 });
+  });
+
+  test('limits copies to what fits on the paper', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByLabel('Photo size').selectOption('us');
+    await expect(page.getByLabel('Copies (up to 2)')).toHaveValue('2');
+    await page.getByLabel('Print paper').selectOption('a4');
+    await page.getByLabel(/Copies/).fill('8');
+    await expect(page.getByLabel(/Copies/)).toHaveValue('8');
+  });
+
+  test('clears the downloads when the crop changes', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+    await expect(page.getByRole('link', { name: /Download Single Photo/ })).toBeVisible({ timeout: WORK_TIMEOUT });
+    await page.getByRole('img', { name: /Photo preview/ }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('link', { name: /Download Single Photo/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Create Passport Photos' })).toBeVisible();
+  });
+});
