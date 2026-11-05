@@ -302,4 +302,46 @@ test.describe('Passport Photo Maker', () => {
     await expect(page.getByText(/No face was found/).first()).toBeVisible({ timeout: WORK_TIMEOUT });
     await expect(page.getByRole('button', { name: 'Auto-align my face' })).toBeEnabled();
   });
+  test('auto-enhance brightens a dark photo', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'dark.png');
+    await page.getByRole('button', { name: 'Auto-enhance' }).click();
+    await expect(page.getByText(/^Brightness: \+\d+/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reset all adjustments' })).toBeVisible();
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+
+    const { bytes } = await downloadFrom(page, /Download Single Photo/);
+    const { corner } = await decodeImage(page, bytes, 'image/jpeg');
+    expect(corner[0]).toBeGreaterThan(80); // The background was 40 before.
+  });
+
+  test('straightens, changes colour and resets in one click', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await expect(page.getByRole('button', { name: 'Reset all adjustments' })).toHaveCount(0);
+
+    await page.getByRole('slider', { name: /Straighten/ }).focus();
+    await page.keyboard.press('End');
+    await expect(page.getByText('Straighten: +15.0°')).toBeVisible();
+    await page.getByRole('slider', { name: /Colour/ }).focus();
+    await page.keyboard.press('Home');
+    await expect(page.getByText('Colour: -100')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Reset all adjustments' }).click();
+    await expect(page.getByText('Straighten: 0.0°')).toBeVisible();
+    await expect(page.getByText('Colour: 0')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reset all adjustments' })).toHaveCount(0);
+  });
+
+  test('black and white at minimum colour', async ({ page }) => {
+    await page.goto('/passport-photo');
+    await choose(page, 'photo.jpg');
+    await page.getByRole('slider', { name: /Colour/ }).focus();
+    await page.keyboard.press('Home');
+    await page.getByRole('button', { name: 'Create Passport Photos' }).click();
+    const { bytes } = await downloadFrom(page, /Download Single Photo/);
+    const { corner } = await decodeImage(page, bytes, 'image/jpeg');
+    expect(Math.abs(corner[0] - corner[1])).toBeLessThanOrEqual(6);
+    expect(Math.abs(corner[1] - corner[2])).toBeLessThanOrEqual(6);
+  });
 });

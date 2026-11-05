@@ -1,7 +1,7 @@
 'use client';
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
-import { Download, IdCard, ImagePlus, Loader2, RotateCcw, ScanFace } from 'lucide-react';
+import { Download, IdCard, ImagePlus, Loader2, RotateCcw, ScanFace, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FileDropzone } from '@/components/file-dropzone';
 import { Input } from '@/components/ui/input';
@@ -25,9 +25,11 @@ import {
   type PassportOptions,
 } from '@/lib/conversions/passport-photo';
 import {
+  autoAdjustments,
   composePhoto,
   findFace,
   findPerson,
+  isAdjusted,
   noAdjustments,
   workingCanvas,
   type Adjustments,
@@ -183,6 +185,26 @@ export function PassportPhoto() {
     } catch {
       showError(new Error(`"${selected.name}" could not be read as an image.`));
     }
+  };
+
+  /** Picks brightness and contrast from the photo itself, judging only the person when known. */
+  const handleAutoEnhance = () => {
+    if (!base) return;
+    const pixels = base.getContext('2d')?.getImageData(0, 0, base.width, base.height);
+    if (!pixels) return;
+
+    let weights: Uint8ClampedArray | undefined;
+    if (personMask) {
+      // The mask can be smaller than the photo, so look up each pixel's place in it.
+      weights = new Uint8ClampedArray(base.width * base.height);
+      for (let y = 0; y < base.height; y++) {
+        const maskRow = Math.min(personMask.height - 1, Math.floor((y / base.height) * personMask.height)) * personMask.width;
+        for (let x = 0; x < base.width; x++) {
+          weights[y * base.width + x] = personMask.alpha[maskRow + Math.min(personMask.width - 1, Math.floor((x / base.width) * personMask.width))];
+        }
+      }
+    }
+    setAdjustments((current) => ({ ...current, ...autoAdjustments(pixels.data, weights) }));
   };
 
   const handleAlignFace = async () => {
@@ -451,6 +473,17 @@ export function PassportPhoto() {
             </Section>
 
             <Section title="Adjust">
+              <div className="flex flex-wrap items-center gap-3">
+                <Button type="button" variant="outline" onClick={handleAutoEnhance} disabled={waitingForMask}>
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Auto-enhance
+                </Button>
+                {isAdjusted(adjustments) && (
+                  <Button type="button" variant="link" className="h-auto p-0" onClick={() => setAdjustments(noAdjustments)}>
+                    Reset all adjustments
+                  </Button>
+                )}
+              </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-3">
                   <Label id="brightness-label">Brightness: {signed(adjustments.brightness)}</Label>
@@ -460,12 +493,18 @@ export function PassportPhoto() {
                   <Label id="contrast-label">Contrast: {signed(adjustments.contrast)}</Label>
                   <Slider aria-labelledby="contrast-label" min={-50} max={50} step={1} value={[adjustments.contrast]} onValueChange={setAdjustment('contrast')} />
                 </div>
+                <div className="space-y-3">
+                  <Label id="saturation-label">Colour: {signed(adjustments.saturation)}</Label>
+                  <Slider aria-labelledby="saturation-label" min={-100} max={100} step={1} value={[adjustments.saturation]} onValueChange={setAdjustment('saturation')} />
+                </div>
+                <div className="space-y-3">
+                  <Label id="rotation-label">Straighten: {adjustments.rotation > 0 ? '+' : ''}{adjustments.rotation.toFixed(1)}°</Label>
+                  <Slider aria-labelledby="rotation-label" min={-15} max={15} step={0.5} value={[adjustments.rotation]} onValueChange={setAdjustment('rotation')} />
+                </div>
               </div>
-              {(adjustments.brightness !== 0 || adjustments.contrast !== 0) && (
-                <Button type="button" variant="link" className="h-auto p-0" onClick={() => setAdjustments(noAdjustments)}>
-                  Reset brightness and contrast
-                </Button>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Passport offices want natural colours and a level head. Don&apos;t over-edit: heavy changes can get a photo rejected.
+              </p>
             </Section>
 
             <Section title="Print">
