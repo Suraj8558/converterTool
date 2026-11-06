@@ -1,4 +1,4 @@
-import { ArrowRightLeft, BookOpen, Clapperboard, Combine, Crop, FileAudio, FileImage, FileText, FileVideo, Hash, ImageIcon, LayoutGrid, RotateCw, Scissors, Shrink, Stamp } from 'lucide-react';
+import { ArrowRightLeft, BookOpen, Clapperboard, Combine, Crop, FileAudio, FileImage, FileText, FileVideo, Hash, IdCard, ImageIcon, LayoutGrid, RotateCw, Scissors, Shrink, Stamp } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 type Tool = {
@@ -30,6 +30,7 @@ export const toolCategories: ToolCategory[] = [
       { name: 'JPG to AVIF', href: '/jpg-to-avif', description: 'Transform JPGs to the next-gen AVIF format for smaller files.', icon: <ArrowRightLeft className="w-6 h-6"/> },
       { name: 'PNG to AVIF', href: '/png-to-avif', description: 'Convert PNGs to efficient AVIF files, keeping transparency.', icon: <ArrowRightLeft className="w-6 h-6"/> },
       { name: 'Image Resizer', href: '/image-resizer', description: 'Resize images to your exact dimensions.', icon: <Scissors className="w-6 h-6"/> },
+      { name: 'Passport Photo Maker', href: '/passport-photo', description: 'Make passport and visa photos: align your face, change the background, set a file size, print a sheet.', icon: <IdCard className="w-6 h-6"/> },
       { name: 'Image Compressor', href: '/image-compressor', description: 'Reduce image file sizes with smart, adjustable compression.', icon: <Shrink className="w-6 h-6"/> },
     ],
   },
