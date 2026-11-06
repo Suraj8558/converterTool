@@ -49,3 +49,8 @@ firestore-debug.log
 # playwright
 /test-results/
 /playwright-report/
+
+# graphify / Claude Code generated
+/graphify-out/
+/.claude/project-map.md
+/.claude/cloude-code-toolbox-mcp-skills-awareness.md
