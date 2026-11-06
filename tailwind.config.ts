@@ -9,6 +9,11 @@ export default {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    container: {
+      center: true,
+      padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' },
+      screens: { '2xl': '1280px' },
+    },
     extend: {
       fontFamily: {
         body: ['var(--font-inter)', 'sans-serif'],
@@ -67,6 +72,10 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+      },
+      boxShadow: {
+        soft: '0 1px 2px hsl(var(--shadow) / 0.06), 0 8px 24px -12px hsl(var(--shadow) / 0.18)',
+        lift: '0 2px 4px hsl(var(--shadow) / 0.06), 0 18px 40px -16px hsl(var(--primary) / 0.35)',
       },
       borderRadius: {
         lg: 'var(--radius)',

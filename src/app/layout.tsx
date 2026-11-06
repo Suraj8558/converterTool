@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import Header from "@/components/layout/header"
 import Footer from "@/components/layout/footer"
+import { ToolBreadcrumb } from "@/components/layout/tool-breadcrumb"
 import { pageMetadata, siteName, siteUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 import { Inter, Lexend } from 'next/font/google';
@@ -67,7 +68,10 @@ export default function RootLayout({
           >
           <div className="relative flex min-h-dvh flex-col bg-background">
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1">
+              <ToolBreadcrumb />
+              {children}
+            </main>
             <Footer />
           </div>
           <Toaster />

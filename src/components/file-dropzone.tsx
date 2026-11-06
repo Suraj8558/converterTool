@@ -36,7 +36,7 @@ export function FileDropzone({ accept, multiple = true, onFiles }: FileDropzoneP
     <div
       role="button"
       tabIndex={0}
-      className="border border-border rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted transition-colors bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="group rounded-xl border-2 border-dashed border-primary/30 bg-gradient-to-b from-primary/5 to-transparent p-6 text-center cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background sm:p-10"
       onClick={() => inputRef.current?.click()}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -50,8 +50,10 @@ export function FileDropzone({ accept, multiple = true, onFiles }: FileDropzoneP
         receive(Array.from(event.dataTransfer.files));
       }}
     >
-      <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-      <p className="mt-4 text-muted-foreground">Drag & drop your files here, or click to browse</p>
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform duration-200 group-hover:-translate-y-1">
+        <UploadCloud className="h-7 w-7" />
+      </span>
+      <p className="mt-4 font-medium text-foreground">Drag & drop your files here, or click to browse</p>
       <p className="text-xs text-muted-foreground mt-1">Supported format(s): {extensions.join(', ')}</p>
       <input
         ref={inputRef}

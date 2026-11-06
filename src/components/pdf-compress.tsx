@@ -60,10 +60,10 @@ export function PdfCompress() {
   const baseName = file?.name.replace(/\.pdf$/i, '');
 
   return (
-    <div className="container mx-auto max-w-3xl py-12">
-      <Card className="rounded-xl shadow-lg">
+    <div className="container mx-auto max-w-3xl py-8 md:py-12">
+      <Card className="shadow-soft">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold font-headline">PDF Compress</CardTitle>
+          <CardTitle className="text-2xl font-bold sm:text-3xl">PDF Compress</CardTitle>
           <CardDescription>Reduce the file size of a PDF, right in your browser.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

@@ -143,9 +143,9 @@ export function ImageCompressor() {
     : 0;
 
   return (
-    <Card className="rounded-xl shadow-lg w-full">
+    <Card className="shadow-soft w-full">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold font-headline">Image Compressor</CardTitle>
+        <CardTitle className="text-2xl font-bold sm:text-3xl">Image Compressor</CardTitle>
         <CardDescription>Reduce image file sizes with an adjustable quality setting.</CardDescription>
       </CardHeader>
       <CardContent>

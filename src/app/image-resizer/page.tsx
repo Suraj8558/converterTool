@@ -10,7 +10,7 @@ export const metadata: Metadata = pageMetadata(
 
 export default function ImageResizerPage() {
   return (
-    <div className="container mx-auto max-w-4xl py-12 flex justify-center">
+    <div className="container mx-auto max-w-4xl py-8 md:py-12 flex justify-center">
       <ImageResizer />
     </div>
   );
