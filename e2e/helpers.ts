@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { expect, type Download, type Page } from '@playwright/test';
+import { expect, test, type Download, type Page } from '@playwright/test';
 
 export const fixture = (name: string) => join(__dirname, 'fixtures', name);
 
@@ -69,4 +69,13 @@ export async function decodeImage(page: Page, bytes: Buffer, mimeType: string) {
     },
     { base64: bytes.toString('base64'), mimeType }
   );
+}
+
+/**
+ * Skips the current test when the browser has no WebGL. MediaPipe (background removal and face
+ * detection) needs a GL context even with the CPU delegate, and headless Firefox on CI has none.
+ */
+export async function skipWithoutWebGL(page: Page) {
+  const hasWebGL = await page.evaluate(() => !!document.createElement('canvas').getContext('webgl2'));
+  test.skip(!hasWebGL, 'This browser has no WebGL, which the ML models need');
 }
