@@ -46,10 +46,10 @@ export function ContactForm() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-12">
+    <div className="container mx-auto max-w-2xl py-8 md:py-12">
       <Card>
         <CardHeader>
-          <CardTitle className="text-3xl font-bold font-headline">Contact Us</CardTitle>
+          <CardTitle className="text-2xl font-bold sm:text-3xl">Contact Us</CardTitle>
           <CardDescription>
             {contactEmail
               ? 'Have a question or feedback? Fill out the form below to start an email to us.'

@@ -43,10 +43,10 @@ export function ImagesToPdf() {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl py-12">
-      <Card className="rounded-xl shadow-lg">
+    <div className="container mx-auto max-w-3xl py-8 md:py-12">
+      <Card className="shadow-soft">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold font-headline">Images to PDF</CardTitle>
+          <CardTitle className="text-2xl font-bold sm:text-3xl">Images to PDF</CardTitle>
           <CardDescription>Combine JPG, PNG and WebP images into one PDF, with one image on each page.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

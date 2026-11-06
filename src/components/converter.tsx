@@ -173,10 +173,10 @@ export function Converter({ title, description, fromType, toType, engine }: Conv
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-12">
-      <Card className="rounded-xl shadow-lg">
+    <div className="container mx-auto max-w-3xl py-8 md:py-12">
+      <Card className="shadow-soft">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold font-headline">{title}</CardTitle>
+          <CardTitle className="text-2xl font-bold sm:text-3xl">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

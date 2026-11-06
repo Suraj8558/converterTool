@@ -140,9 +140,9 @@ export function ImageResizer() {
   }
 
   return (
-    <Card className="rounded-xl shadow-lg w-full">
+    <Card className="shadow-soft w-full">
       <CardHeader>
-        <CardTitle className="text-3xl font-bold font-headline">Image Resizer</CardTitle>
+        <CardTitle className="text-2xl font-bold sm:text-3xl">Image Resizer</CardTitle>
         <CardDescription>Resize your images to the perfect dimensions.</CardDescription>
       </CardHeader>
       <CardContent>

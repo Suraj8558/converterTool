@@ -8,10 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 export const primaryButtonClass =
-  'w-full h-12 text-lg font-bold text-primary-foreground bg-gradient-to-r from-primary to-tertiary hover:saturate-150 transition-all duration-300';
+  'w-full h-12 text-base font-semibold shadow-md hover:shadow-lg bg-brand-gradient hover:saturate-150';
 
 export const selectClass =
-  'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+  'flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
 export function ToolCard({
   title,
@@ -25,10 +25,10 @@ export function ToolCard({
   children: ReactNode;
 }) {
   return (
-    <div className={cn('container mx-auto py-12', wide ? 'max-w-5xl' : 'max-w-3xl')}>
-      <Card className="rounded-xl shadow-lg">
+    <div className={cn('container mx-auto py-8 md:py-12', wide ? 'max-w-5xl' : 'max-w-3xl')}>
+      <Card className="shadow-soft">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold font-headline">{title}</CardTitle>
+          <CardTitle className="text-2xl font-bold sm:text-3xl">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">{children}</CardContent>
