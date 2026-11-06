@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import JSZip from 'jszip';
 import { PDFDocument } from 'pdf-lib';
 import { statSync } from 'node:fs';
-import { choose, decodeImage, downloadFrom, fixture, WORK_TIMEOUT } from './helpers';
+import { choose, decodeImage, downloadFrom, fixture, skipWithoutWebGL, WORK_TIMEOUT } from './helpers';
 
 const pageTexts = async (bytes: Buffer) => (await PDFDocument.load(bytes)).getPageCount();
 
@@ -253,6 +253,7 @@ test.describe('Passport Photo Maker', () => {
   test('replaces the background with a chosen colour', async ({ page }) => {
     test.setTimeout(120_000);
     await page.goto('/passport-photo');
+    await skipWithoutWebGL(page);
     await choose(page, 'photo.jpg');
     await expect(page.getByRole('button', { name: 'Use an image' })).toHaveCount(0);
     await page.getByLabel('Remove the original background').click();
@@ -270,6 +271,7 @@ test.describe('Passport Photo Maker', () => {
   test('puts an uploaded image behind the person', async ({ page }) => {
     test.setTimeout(120_000);
     await page.goto('/passport-photo');
+    await skipWithoutWebGL(page);
     await choose(page, 'photo.jpg');
     await page.getByLabel('Remove the original background').click();
     await expect(page.getByRole('status').filter({ hasText: 'Removing background' })).toHaveCount(0, { timeout: WORK_TIMEOUT });
@@ -297,6 +299,7 @@ test.describe('Passport Photo Maker', () => {
   test('says so when there is no face to align', async ({ page }) => {
     test.setTimeout(120_000);
     await page.goto('/passport-photo');
+    await skipWithoutWebGL(page);
     await choose(page, 'photo.jpg');
     await page.getByRole('button', { name: 'Auto-align my face' }).click();
     await expect(page.getByText(/No face was found/).first()).toBeVisible({ timeout: WORK_TIMEOUT });
