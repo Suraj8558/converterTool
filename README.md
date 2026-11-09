@@ -4,6 +4,8 @@
 
 **📖 [Read the documentation](docs/README.md)**, including [what every tool does and its limits](docs/features.md).
 
+**📱 [Android app](mobile/README.md)** — an Expo app that shows this site in a WebView, built with EAS.
+
 ---
 
 ## ✨ Features
