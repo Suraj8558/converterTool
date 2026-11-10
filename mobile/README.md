@@ -95,12 +95,24 @@ Before the first release, check:
 
 ## Tests
 
-The logic that decides what the app trusts (`src/navigation.ts`, `src/downloads.ts`) is
-tested with the website's unit tests: run `npm test` in the project root. The injected
-script is tested against the real site in `e2e/mobile-bridge.spec.ts`: it checks that
-results from real tools arrive in the right chunks and come back byte for byte.
+Three kinds, none of which need a phone:
 
-`npm run typecheck` here checks the app's own code.
+- **Website unit tests** (`npm test` in the project root) cover the logic that decides what
+  the app trusts: `src/navigation.ts` and `src/downloads.ts`.
+- **Browser tests** (`e2e/mobile-bridge.spec.ts`) run the injected script against the real
+  site. They check that results from real tools arrive in the right chunks and come back
+  byte for byte.
+- **App tests** (`npm test` in this folder) run `App.tsx` and `src/DownloadReceiver.ts` in
+  Node with [Jest](https://jestjs.io) and React Native Testing Library. They check the setup
+  message, which links stay in the app, the offline screen, the back button, and saving a
+  file from the first chunk to the share sheet, including errors, chunks in order, and
+  unsafe file names.
 
-Not covered by tests: the Android side of `DownloadReceiver.ts` (writing the file and
-opening the share sheet), and the WebView itself. Check those on a real phone before releasing.
+`npm run typecheck` here checks the app's own code and tests.
+
+**What the app tests do not prove.** The WebView, the file system and the share sheet are
+replaced by fakes (`__tests__/support/`), so they check how the app *uses* those pieces, not
+how Android behaves. The app tests also don't run in CI, which installs only the website's
+packages. Before releasing, install a build on a real phone and check that a tool's result
+can be saved, that the back button and links behave, and that the app works with the phone
+offline.
