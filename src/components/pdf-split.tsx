@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Download, RotateCcw, Scissors } from 'lucide-react';
+import { RotateCcw, Scissors } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { FileDropzone } from '@/components/file-dropzone';
+import { ResultPanel } from '@/components/tool-shell';
 import { useToast } from '@/hooks/use-toast';
 import { loadPdf, parsePageRanges } from '@/lib/conversions/pdf-tools';
 
@@ -104,19 +105,7 @@ export function PdfSplit() {
           {!file ? (
             <FileDropzone accept="pdf" multiple={false} onFiles={handleFile} />
           ) : result ? (
-            <div className="text-center space-y-4">
-              <h3 className="text-2xl font-bold font-headline">Split Complete!</h3>
-              <Button asChild size="lg" className="w-full">
-                <a href={result.url} download={result.name}>
-                  <Download className="mr-2 h-5 w-5" />
-                  Download {result.name}
-                </a>
-              </Button>
-              <Button onClick={handleReset} variant="outline" className="w-full">
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Split Another PDF
-              </Button>
-            </div>
+            <ResultPanel result={result} heading="Split Complete!" resetLabel="Split Another PDF" onReset={handleReset} />
           ) : (
             <>
               <p className="text-sm text-center text-muted-foreground">

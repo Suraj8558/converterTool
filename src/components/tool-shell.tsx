@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Download, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -74,6 +74,28 @@ export function useToolError(title: string) {
   );
 }
 
+/** A download link that wraps a long file name onto more lines, instead of running past the button. */
+export function DownloadButton({
+  href,
+  fileName,
+  variant,
+  children,
+}: {
+  href: string;
+  fileName: string;
+  variant?: ButtonProps['variant'];
+  children: ReactNode;
+}) {
+  return (
+    <Button asChild size="lg" variant={variant} className="h-auto min-h-12 w-full whitespace-normal py-3 text-center">
+      <a href={href} download={fileName}>
+        <Download className="mr-2 h-5 w-5" />
+        <span className="min-w-0 break-words">{children}</span>
+      </a>
+    </Button>
+  );
+}
+
 export function ResultPanel({
   result,
   heading = 'Your File Is Ready!',
@@ -88,12 +110,9 @@ export function ResultPanel({
   return (
     <div className="text-center space-y-4">
       <h3 className="text-2xl font-bold font-headline">{heading}</h3>
-      <Button asChild size="lg" className="w-full">
-        <a href={result.url} download={result.name}>
-          <Download className="mr-2 h-5 w-5" />
-          Download {result.name}
-        </a>
-      </Button>
+      <DownloadButton href={result.url} fileName={result.name}>
+        {`Download ${result.name}`}
+      </DownloadButton>
       <Button onClick={onReset} variant="outline" className="w-full">
         <RotateCcw className="mr-2 h-4 w-4" />
         {resetLabel}

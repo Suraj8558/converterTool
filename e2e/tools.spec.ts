@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import JSZip from 'jszip';
 import { PDFDocument } from 'pdf-lib';
-import { statSync } from 'node:fs';
-import { choose, decodeImage, downloadFrom, fixture, skipWithoutWebGL, WORK_TIMEOUT } from './helpers';
+import { readFileSync, statSync } from 'node:fs';
+import { choose, decodeImage, downloadFrom, fixture, pageIsReady, skipWithoutWebGL, WORK_TIMEOUT } from './helpers';
 
 const pageTexts = async (bytes: Buffer) => (await PDFDocument.load(bytes)).getPageCount();
 
@@ -58,6 +58,33 @@ test.describe('PDF Split', () => {
     const { bytes } = await downloadFrom(page, /Download b_pages\.zip/);
     const zip = await JSZip.loadAsync(bytes);
     expect(Object.keys(zip.files).sort()).toEqual(['b_page_1.pdf', 'b_page_2.pdf', 'b_page_3.pdf']);
+  });
+});
+
+test.describe('Download button', () => {
+  test('keeps a long file name inside the button on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto('/pdf-split');
+    await pageIsReady(page);
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'merged_watermarked_quarterly_report.pdf',
+      mimeType: 'application/pdf',
+      buffer: readFileSync(fixture('b.pdf')),
+    });
+    await expect(page.getByLabel('Pages')).toHaveValue('1-3');
+    await page.getByRole('button', { name: 'Split PDF' }).click();
+
+    const link = page.getByRole('link', { name: /Download merged_watermarked_quarterly_report_pages\.pdf/ });
+    await expect(link).toBeVisible({ timeout: WORK_TIMEOUT });
+    const box = await link.evaluate((element) => {
+      const outer = element.getBoundingClientRect();
+      const text = element.querySelector('span')!.getBoundingClientRect();
+      const icon = element.querySelector('svg')!.getBoundingClientRect();
+      return { outer, text, icon, scrollWidth: element.scrollWidth, clientWidth: element.clientWidth };
+    });
+    expect(box.text.right).toBeLessThanOrEqual(box.outer.right + 1);
+    expect(box.text.left).toBeGreaterThanOrEqual(box.icon.right - 1); // The text never covers the icon.
+    expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth + 1);
   });
 });
 
