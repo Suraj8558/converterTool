@@ -1,14 +1,14 @@
 'use client';
 
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
-import { Download, IdCard, ImagePlus, Loader2, RotateCcw, ScanFace, Wand2 } from 'lucide-react';
+import { IdCard, ImagePlus, Loader2, RotateCcw, ScanFace, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FileDropzone } from '@/components/file-dropzone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { ToolCard, baseName, primaryButtonClass, selectClass, useToolError } from '@/components/tool-shell';
+import { DownloadButton, ToolCard, baseName, primaryButtonClass, selectClass, useToolError } from '@/components/tool-shell';
 import {
   PHOTO_SIZES,
   MAX_ZOOM,
@@ -556,12 +556,9 @@ export function PassportPhoto() {
               <div className="space-y-3">
                 <h3 className="text-xl font-bold font-headline text-center">Your Photos Are Ready!</h3>
                 {outputs.map((output) => (
-                  <Button key={output.name} asChild size="lg" className="w-full" variant={output.name.endsWith('.pdf') ? 'default' : 'secondary'}>
-                    <a href={output.url} download={output.name}>
-                      <Download className="mr-2 h-5 w-5" />
-                      Download {output.label}
-                    </a>
-                  </Button>
+                  <DownloadButton key={output.name} href={output.url} fileName={output.name} variant={output.name.endsWith('.pdf') ? 'default' : 'secondary'}>
+                    {`Download ${output.label}`}
+                  </DownloadButton>
                 ))}
                 <p className="text-xs text-muted-foreground text-center">
                   Print the sheet at 100% / &quot;actual size&quot;, not &quot;fit to page&quot;, so each photo comes out at {photo.widthMm} × {photo.heightMm} mm.
