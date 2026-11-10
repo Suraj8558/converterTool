@@ -19,10 +19,10 @@ export default function Footer() {
           {toolCategories.map((category) => (
             <div key={category.name}>
               <h3 className="font-headline text-sm font-semibold">{category.name}</h3>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-2 md:mt-4 md:space-y-2.5">
                 {category.tools.map((tool) => (
                   <li key={tool.href}>
-                    <Link href={tool.href} className="rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <Link href={tool.href} className="max-md:flex max-md:min-h-11 max-md:w-fit max-md:items-center rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                       {tool.name}
                     </Link>
                   </li>
@@ -35,14 +35,14 @@ export default function Footer() {
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Converter Tool. All rights reserved.
           </p>
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            <Link href="/privacy" className="rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <div className="flex flex-wrap justify-center gap-x-6 md:gap-y-2">
+            <Link href="/privacy" className="max-md:flex max-md:min-h-11 max-md:w-fit max-md:items-center rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               Privacy Policy
             </Link>
-            <Link href="/terms" className="rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link href="/terms" className="max-md:flex max-md:min-h-11 max-md:w-fit max-md:items-center rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               Terms of Service
             </Link>
-            <Link href="/contact" className="rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <Link href="/contact" className="max-md:flex max-md:min-h-11 max-md:w-fit max-md:items-center rounded-sm text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
               Contact
             </Link>
           </div>

@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import { toolCategories } from '@/lib/tools';
 
 const linkClass =
-  'rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
+  'max-md:inline-flex max-md:min-h-11 max-md:items-center rounded-sm underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring';
 
 /** Shows where a tool lives, with a way back to the full list. Renders nothing elsewhere. */
 export function ToolBreadcrumb() {
@@ -16,7 +16,7 @@ export function ToolBreadcrumb() {
   if (!category || !tool) return null;
 
   return (
-    <nav aria-label="Breadcrumb" className="container pt-6">
+    <nav aria-label="Breadcrumb" className="container pt-6 max-md:pt-2">
       <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
         <li>
           <Link href="/" className={linkClass}>
