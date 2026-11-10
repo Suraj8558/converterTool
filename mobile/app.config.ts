@@ -27,6 +27,8 @@ const config: ExpoConfig = {
       'android.permission.VIBRATE',
     ],
   },
+  // The Expo account (here a team) that owns the project below.
+  owner: 'suraj8558s-team',
   // The Expo project this app builds under. It is an identifier, not a secret.
   extra: { eas: { projectId: 'ab58c12e-1693-4eca-9ca9-f149f6e51223' } },
   plugins: [
