@@ -12,7 +12,7 @@ The app adds what a WebView does not do on its own:
   they pick Documents or make one such as "Converter Tool"). Android remembers the choice, so
   later downloads save there straight away, and a notice offers **Share** and **Change
   folder**. If the user would rather not choose a folder, the file opens in Android's share
-  sheet instead, so it is never lost.
+  sheet instead, so it is never lost. If the folder already has a file with that name, the new one is saved as "name (1)", "name (2)" and so on, and nothing is overwritten.
 - **Back button.** It goes back through the site's pages, and leaves the app from the first one.
 - **Links.** Pages of the site stay in the app. Other websites, `mailto:` and `tel:` links
   open in Android's own apps.

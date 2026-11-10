@@ -22,7 +22,7 @@ import type {
 import { SITE_ORIGIN, SITE_URL } from './src/config';
 import { DownloadReceiver, clearOldDownloads } from './src/DownloadReceiver';
 import { androidFolderStore } from './src/saveFolder';
-import { parseBridgeMessage } from './src/downloads';
+import { folderLabel, parseBridgeMessage } from './src/downloads';
 import { DOWNLOAD_BRIDGE_SCRIPT } from './src/injected';
 import { isInsideApp } from './src/navigation';
 
@@ -95,7 +95,7 @@ export default function App() {
 
   const changeFolder = useCallback(async () => {
     const folder = await androidFolderStore.chooseFolder();
-    if (folder) setNotice({ message: `Files will now be saved to ${folder.name}` });
+    if (folder) setNotice({ message: `Files will now be saved to ${folderLabel(folder.uri)}` });
   }, []);
 
   // The back button goes back through the site's pages, and leaves the app from the first one.

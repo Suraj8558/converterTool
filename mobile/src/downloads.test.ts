@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseBridgeMessage, safeFileName } from './downloads';
+import { folderLabel, isAlreadyExists, numberedName, parseBridgeMessage, safeFileName } from './downloads';
 
 const send = (message: unknown) => parseBridgeMessage(JSON.stringify(message));
 
@@ -79,5 +79,58 @@ describe('safeFileName', () => {
     const name = safeFileName(`${'a'.repeat(300)}.pdf`);
     expect(name.length).toBe(120);
     expect(name.endsWith('.pdf')).toBe(true);
+  });
+});
+
+describe('numberedName', () => {
+  it('puts the number before the extension', () => {
+    expect(numberedName('report.pdf', 1)).toBe('report (1).pdf');
+    expect(numberedName('archive.tar.gz', 2)).toBe('archive.tar (2).gz');
+  });
+
+  it('numbers a name with no extension, and ignores a dot that does not start one', () => {
+    expect(numberedName('readme', 3)).toBe('readme (3)');
+    expect(numberedName('.hidden', 1)).toBe('.hidden (1)');
+    expect(numberedName('a.b very long suffix', 1)).toBe('a.b very long suffix (1)');
+  });
+});
+
+describe('isAlreadyExists', () => {
+  it('recognises the file system saying the destination exists', () => {
+    expect(isAlreadyExists(new Error('Destination already exists'))).toBe(true);
+    expect(isAlreadyExists({ code: 'ERR_DESTINATION_ALREADY_EXISTS', message: '' })).toBe(true);
+  });
+
+  it('does not take other errors for it', () => {
+    expect(isAlreadyExists(new Error('Permission denied'))).toBe(false);
+    expect(isAlreadyExists(new Error('The disk is full'))).toBe(false);
+    expect(isAlreadyExists(undefined)).toBe(false);
+    expect(isAlreadyExists('Destination already exists')).toBe(false);
+  });
+});
+
+describe('folderLabel', () => {
+  const tree = (id: string) => `content://com.android.externalstorage.documents/tree/${id}`;
+
+  it('names the last folder of the path', () => {
+    expect(folderLabel(tree('primary%3ADocuments'))).toBe('Documents');
+    expect(folderLabel(tree('primary%3ADocuments%2FConverter%20Tool'))).toBe('Converter Tool');
+    expect(folderLabel(tree('1A2B-3C4D%3APhotos%2F2026'))).toBe('2026');
+  });
+
+  it('names a whole storage when the root was chosen', () => {
+    expect(folderLabel(tree('primary%3A'))).toBe('Internal storage');
+    expect(folderLabel(tree('1A2B-3C4D%3A'))).toBe('Storage');
+  });
+
+  it('copes with a document address inside the tree and a trailing slash', () => {
+    expect(folderLabel(`${tree('primary%3ADocuments')}/document/primary%3ADocuments%2Fx.pdf`)).toBe('Documents');
+    expect(folderLabel(`${tree('primary%3ADocuments')}/`)).toBe('Documents');
+  });
+
+  it('copes with addresses that are not Android trees', () => {
+    expect(folderLabel('content://tree/Converter%20Tool')).toBe('Converter Tool');
+    expect(folderLabel('file:///storage/Pictures/')).toBe('Pictures');
+    expect(folderLabel('')).toBe('the chosen folder');
   });
 });

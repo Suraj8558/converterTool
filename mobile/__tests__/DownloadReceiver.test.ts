@@ -53,8 +53,7 @@ describe('saving in the user’s folder', () => {
 
     expect(fakeFs.files.get(`${CACHE}/abc/my file.pdf`)).toBe('QUJDREVG');
     expect(fakeFs.copies).toEqual([{ from: `${CACHE}/abc/my file.pdf`, to: `${DOCS}/my file.pdf` }]);
-    expect(fakeFs.files.get(`${DOCS}/my file.pdf`)).toBe('QUJDREVG');
-    expect(fakeFs.mimes.get(`${DOCS}/my file.pdf`)).toBe('application/pdf');
+    expect(fakeFs.files.get(`${DOCS}/my file.pdf`)).toBe('QUJDREVG'); // the whole file, not an empty one
     expect(sharingModule.shareAsync).not.toHaveBeenCalled();
     expect(events.onDone).toHaveBeenCalledWith({ name: 'my file.pdf', folder: 'Documents', share: expect.any(Function) });
     expect(events.onFailed).not.toHaveBeenCalled();
@@ -111,16 +110,63 @@ describe('saving in the user’s folder', () => {
     expect(events.onFailed).not.toHaveBeenCalled();
   });
 
-  it('gives a file with no type a general one', async () => {
-    const { receiver } = setup();
-    await sendFile(receiver, 'abc', 'mystery', '');
-    expect(fakeFs.mimes.get(`${DOCS}/mystery`)).toBe('application/octet-stream');
-  });
-
   it('adds an extension from the file type when the name has none', async () => {
     const { receiver } = setup();
     await sendFile(receiver, 'abc', 'photo', 'image/jpeg');
     expect(fakeFs.files.has(`${DOCS}/photo.jpg`)).toBe(true);
+  });
+});
+
+describe('names in the folder', () => {
+  it('never overwrites an earlier file, and numbers the new ones instead', async () => {
+    const { receiver, events } = setup();
+    await sendFile(receiver, 'one', 'report.pdf', 'application/pdf', ['QUJD']);
+    await sendFile(receiver, 'two', 'report.pdf', 'application/pdf', ['REVG']);
+    await sendFile(receiver, 'three', 'report.pdf', 'application/pdf', ['R0hJ']);
+
+    expect(fakeFs.files.get(`${DOCS}/report.pdf`)).toBe('QUJD');
+    expect(fakeFs.files.get(`${DOCS}/report (1).pdf`)).toBe('REVG');
+    expect(fakeFs.files.get(`${DOCS}/report (2).pdf`)).toBe('R0hJ');
+    expect(events.onDone.mock.calls.map(([download]) => download.name)).toEqual(['report.pdf', 'report (1).pdf', 'report (2).pdf']);
+    expect(events.onFailed).not.toHaveBeenCalled();
+    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+  });
+
+  it('keeps a file that was already in the folder', async () => {
+    fakeFs.files.set(`${DOCS}/notes.txt`, 'ORIGINAL');
+    const { receiver } = setup();
+    await sendFile(receiver, 'abc', 'notes.txt', 'text/plain', ['TkVX']);
+    expect(fakeFs.files.get(`${DOCS}/notes.txt`)).toBe('ORIGINAL');
+    expect(fakeFs.files.get(`${DOCS}/notes (1).txt`)).toBe('TkVX');
+  });
+
+  it('numbers a name that has no extension', async () => {
+    fakeFs.files.set(`${DOCS}/readme`, 'ORIGINAL');
+    const { receiver } = setup();
+    await sendFile(receiver, 'abc', 'readme', '', ['TkVX']);
+    expect(fakeFs.files.get(`${DOCS}/readme (1)`)).toBe('TkVX');
+  });
+
+  it('shares the file under the name it was saved with', async () => {
+    fakeFs.files.set(`${DOCS}/a.pdf`, 'ORIGINAL');
+    const { receiver, events } = setup();
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+    await events.onDone.mock.calls[0][0].share();
+    expect(sharingModule.shareAsync).toHaveBeenCalledWith(`${CACHE}/abc/a (1).pdf`, expect.anything());
+  });
+
+  it('leaves no empty file behind when the folder can not be used', async () => {
+    fakeFs.deniedFolders.add(DOCS);
+    const { receiver } = setup(folderStore(DOCS, null));
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+    expect([...fakeFs.files.keys()].filter((address) => address.startsWith(DOCS))).toEqual([]);
+  });
+
+  it('shows the folder under a readable name', async () => {
+    const tree = 'content://com.android.externalstorage.documents/tree/primary%3ADocuments%2FConverter%20Tool';
+    const { receiver, events } = setup(folderStore(tree));
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+    expect(events.onDone).toHaveBeenCalledWith(expect.objectContaining({ folder: 'Converter Tool' }));
   });
 });
 

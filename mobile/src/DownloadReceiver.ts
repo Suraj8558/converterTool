@@ -1,6 +1,6 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { safeFileName, type BridgeMessage } from './downloads';
+import { folderLabel, isAlreadyExists, numberedName, safeFileName, type BridgeMessage } from './downloads';
 import { androidFolderStore, type FolderStore } from './saveFolder';
 
 interface Pending {
@@ -89,11 +89,11 @@ export class DownloadReceiver {
     this.pending.delete(id);
     try {
       await item.writes;
-      const name = item.file.name;
       const share = () => shareFile(item);
       const folder = await this.saveInFolder(item);
       if (folder === null) await share();
-      this.events.onDone({ name, folder, share });
+      // Read the name last: saving renames the file when the folder already has one like it.
+      this.events.onDone({ name: item.file.name, folder, share });
     } catch (error) {
       this.events.onFailed(error instanceof Error ? error.message : 'The file could not be saved.');
     }
@@ -107,9 +107,8 @@ export class DownloadReceiver {
       if (!folder) folder = await this.folders.chooseFolder();
       if (!folder) return null;
       try {
-        const target = folder.createFile(item.file.name, item.mime || 'application/octet-stream');
-        await item.file.copy(target);
-        return folder.name;
+        await copyWithFreeName(item.file, folder);
+        return folderLabel(folder.uri);
       } catch {
         this.folders.forget();
         folder = null;
@@ -132,4 +131,26 @@ export class DownloadReceiver {
 async function shareFile(item: Pending) {
   if (!(await Sharing.isAvailableAsync())) throw new Error('Sharing is not available on this device.');
   await Sharing.shareAsync(item.file.uri, { mimeType: item.mime || undefined, dialogTitle: item.file.name });
+}
+
+const MAX_NAMES = 100;
+
+/**
+ * Copies the file into the folder under its own name, or "name (1)", "name (2)" and so on
+ * when the folder already has one. The file system refuses to copy onto an existing file, so
+ * nothing the user saved earlier is overwritten, and no empty file is left behind.
+ */
+async function copyWithFreeName(file: File, folder: Directory) {
+  const wanted = file.name;
+  for (let number = 0; number < MAX_NAMES; number++) {
+    const name = number === 0 ? wanted : numberedName(wanted, number);
+    if (name !== file.name) file.rename(name);
+    try {
+      await file.copy(folder);
+      return;
+    } catch (error) {
+      if (!isAlreadyExists(error)) throw error;
+    }
+  }
+  throw new Error('The folder already has too many files with this name.');
 }

@@ -78,3 +78,39 @@ export function safeFileName(name: string, mime = ''): string {
   if (extension && !/\.[A-Za-z0-9]{1,8}$/.test(clean)) clean += `.${extension}`;
   return clean;
 }
+
+/** "report.pdf" becomes "report (2).pdf": the name to try when the first one is taken. */
+export function numberedName(name: string, number: number): string {
+  const dot = name.lastIndexOf('.');
+  const hasExtension = dot > 0 && name.length - dot <= 10;
+  const stem = hasExtension ? name.slice(0, dot) : name;
+  const extension = hasExtension ? name.slice(dot) : '';
+  return `${stem} (${number})${extension}`;
+}
+
+/** True for the error Expo's file system gives when the destination already has a file of that name. */
+export function isAlreadyExists(error: unknown): boolean {
+  const { code, message } = (error ?? {}) as { code?: unknown; message?: unknown };
+  return /already exists|already_exists/i.test(`${String(code ?? '')} ${String(message ?? '')}`);
+}
+
+/**
+ * A folder's name for people, from the address Android's folder picker gives. Those addresses
+ * hold an encoded path, such as .../tree/primary%3ADocuments%2FConverter%20Tool, which is
+ * the folder "Converter Tool" inside Documents on the phone's own storage.
+ */
+export function folderLabel(uri: string): string {
+  const decode = (text: string) => {
+    try {
+      return decodeURIComponent(text);
+    } catch {
+      return text;
+    }
+  };
+  const tree = /\/tree\/([^/]+)/.exec(uri);
+  const id = decode(tree ? tree[1] : (uri.replace(/\/+$/, '').split('/').pop() ?? ''));
+  const colon = id.indexOf(':');
+  const path = colon >= 0 ? id.slice(colon + 1) : id;
+  if (colon >= 0 && path === '') return id.startsWith('primary') ? 'Internal storage' : 'Storage';
+  return path.split('/').filter(Boolean).pop() || 'the chosen folder';
+}
