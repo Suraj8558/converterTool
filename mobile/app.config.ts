@@ -4,7 +4,8 @@ import type { ExpoConfig } from 'expo/config';
 // first release. Change it here before publishing.
 const config: ExpoConfig = {
   name: 'Converter Tool',
-  slug: 'converter-tool',
+  // Must match the slug of the Expo project the ID below belongs to, or EAS refuses to build.
+  slug: 'suraj-kumar',
   version: '1.0.0',
   orientation: 'default',
   icon: './assets/icon.png',
@@ -26,6 +27,8 @@ const config: ExpoConfig = {
       'android.permission.VIBRATE',
     ],
   },
+  // The Expo project this app builds under. It is an identifier, not a secret.
+  extra: { eas: { projectId: 'ab58c12e-1693-4eca-9ca9-f149f6e51223' } },
   plugins: [
     [
       'expo-splash-screen',
