@@ -1,14 +1,39 @@
 import { DownloadReceiver, clearOldDownloads, type DownloadEvents } from '../src/DownloadReceiver';
-import { fakeFs, sharingModule } from './support/fakeNative';
+import type { FolderStore } from '../src/saveFolder';
+import { FakeDirectory, fakeFs, sharingModule } from './support/fakeNative';
 
 jest.mock('expo-file-system', () => require('./support/fakeNative').fileSystemModule);
 jest.mock('expo-sharing', () => require('./support/fakeNative').sharingModule);
 
-const FOLDER = 'file:///cache/downloads';
+const CACHE = 'file:///cache/downloads';
+const DOCS = 'content://tree/Documents';
 
-function setup() {
+/** A folder store that remembers `saved`, and lets the user choose `next` when asked. */
+function folderStore(saved: string | null, next: string | null = null) {
+  let current = saved;
+  const store = {
+    savedFolder: jest.fn(() => (current ? (new FakeDirectory(current) as never) : null)),
+    chooseFolder: jest.fn(async () => {
+      if (next === null) return null;
+      current = next;
+      return new FakeDirectory(next) as never;
+    }),
+    forget: jest.fn(() => {
+      current = null;
+    }),
+  } satisfies FolderStore;
+  return store;
+}
+
+function setup(store = folderStore(DOCS)) {
   const events = { onStart: jest.fn(), onDone: jest.fn(), onFailed: jest.fn() } satisfies DownloadEvents;
-  return { events, receiver: new DownloadReceiver(events) };
+  return { events, store, receiver: new DownloadReceiver(events, store) };
+}
+
+async function sendFile(receiver: DownloadReceiver, id: string, name: string, mime: string, chunks = ['QUJD', 'REVG']) {
+  await receiver.handle({ type: 'download-start', id, name, mime });
+  for (const data of chunks) await receiver.handle({ type: 'download-chunk', id, data });
+  await receiver.handle({ type: 'download-end', id });
 }
 
 beforeEach(() => {
@@ -17,8 +42,8 @@ beforeEach(() => {
   sharingModule.shareAsync.mockClear().mockResolvedValue(undefined);
 });
 
-describe('DownloadReceiver', () => {
-  it('puts the chunks together, saves the file and opens the share sheet', async () => {
+describe('saving in the user’s folder', () => {
+  it('puts the chunks together and saves the file in the chosen folder, without the share sheet', async () => {
     const { receiver, events } = setup();
     await receiver.handle({ type: 'download-start', id: 'abc', name: 'my file.pdf', mime: 'application/pdf' });
     expect(events.onStart).toHaveBeenCalledWith('my file.pdf');
@@ -26,15 +51,80 @@ describe('DownloadReceiver', () => {
     await receiver.handle({ type: 'download-chunk', id: 'abc', data: 'REVG' });
     await receiver.handle({ type: 'download-end', id: 'abc' });
 
-    expect(fakeFs.files.get(`${FOLDER}/abc/my file.pdf`)).toBe('QUJDREVG');
-    expect(sharingModule.shareAsync).toHaveBeenCalledWith(`${FOLDER}/abc/my file.pdf`, {
-      mimeType: 'application/pdf',
-      dialogTitle: 'my file.pdf',
-    });
-    expect(events.onDone).toHaveBeenCalledTimes(1);
+    expect(fakeFs.files.get(`${CACHE}/abc/my file.pdf`)).toBe('QUJDREVG');
+    expect(fakeFs.copies).toEqual([{ from: `${CACHE}/abc/my file.pdf`, to: `${DOCS}/my file.pdf` }]);
+    expect(fakeFs.files.get(`${DOCS}/my file.pdf`)).toBe('QUJDREVG');
+    expect(fakeFs.mimes.get(`${DOCS}/my file.pdf`)).toBe('application/pdf');
+    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+    expect(events.onDone).toHaveBeenCalledWith({ name: 'my file.pdf', folder: 'Documents', share: expect.any(Function) });
     expect(events.onFailed).not.toHaveBeenCalled();
   });
 
+  it('can share the saved file afterwards', async () => {
+    const { receiver, events } = setup();
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+    await events.onDone.mock.calls[0][0].share();
+    expect(sharingModule.shareAsync).toHaveBeenCalledWith(`${CACHE}/abc/a.pdf`, { mimeType: 'application/pdf', dialogTitle: 'a.pdf' });
+  });
+
+  it('asks for a folder the first time, then uses it without asking again', async () => {
+    const { receiver, store, events } = setup(folderStore(null, DOCS));
+    await sendFile(receiver, 'one', 'one.pdf', 'application/pdf');
+    expect(store.chooseFolder).toHaveBeenCalledTimes(1);
+    expect(fakeFs.files.has(`${DOCS}/one.pdf`)).toBe(true);
+
+    await sendFile(receiver, 'two', 'two.pdf', 'application/pdf');
+    expect(store.chooseFolder).toHaveBeenCalledTimes(1);
+    expect(fakeFs.files.has(`${DOCS}/two.pdf`)).toBe(true);
+    expect(events.onDone).toHaveBeenCalledTimes(2);
+    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+  });
+
+  it('opens the share sheet instead when the user declines to choose a folder', async () => {
+    const { receiver, events } = setup(folderStore(null, null));
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+    expect(fakeFs.copies).toEqual([]);
+    expect(sharingModule.shareAsync).toHaveBeenCalledWith(`${CACHE}/abc/a.pdf`, expect.objectContaining({ mimeType: 'application/pdf' }));
+    expect(events.onDone).toHaveBeenCalledWith(expect.objectContaining({ name: 'a.pdf', folder: null }));
+  });
+
+  it('asks again when Android has taken back access to the folder', async () => {
+    fakeFs.deniedFolders.add(DOCS);
+    const NEW = 'content://tree/Converter%20Tool';
+    const store = folderStore(DOCS, NEW);
+    const { receiver, events } = setup(store);
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+
+    expect(store.forget).toHaveBeenCalledTimes(1);
+    expect(store.chooseFolder).toHaveBeenCalledTimes(1);
+    expect(fakeFs.files.has(`${NEW}/a.pdf`)).toBe(true);
+    expect(events.onDone).toHaveBeenCalledWith(expect.objectContaining({ folder: 'Converter Tool' }));
+    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the share sheet when no folder works, so the file is never lost', async () => {
+    fakeFs.deniedFolders.add(DOCS);
+    const { receiver, events } = setup(folderStore(DOCS, DOCS));
+    await sendFile(receiver, 'abc', 'a.pdf', 'application/pdf');
+    expect(sharingModule.shareAsync).toHaveBeenCalledTimes(1);
+    expect(events.onDone).toHaveBeenCalledWith(expect.objectContaining({ folder: null }));
+    expect(events.onFailed).not.toHaveBeenCalled();
+  });
+
+  it('gives a file with no type a general one', async () => {
+    const { receiver } = setup();
+    await sendFile(receiver, 'abc', 'mystery', '');
+    expect(fakeFs.mimes.get(`${DOCS}/mystery`)).toBe('application/octet-stream');
+  });
+
+  it('adds an extension from the file type when the name has none', async () => {
+    const { receiver } = setup();
+    await sendFile(receiver, 'abc', 'photo', 'image/jpeg');
+    expect(fakeFs.files.has(`${DOCS}/photo.jpg`)).toBe(true);
+  });
+});
+
+describe('receiving', () => {
   it('keeps the chunks in order even when an earlier write is slower', async () => {
     fakeFs.writeDelays = [40, 0, 0];
     const { receiver } = setup();
@@ -44,35 +134,27 @@ describe('DownloadReceiver', () => {
     void receiver.handle({ type: 'download-chunk', id: 'slow', data: 'BBBB' });
     void receiver.handle({ type: 'download-chunk', id: 'slow', data: 'CCCC' });
     await receiver.handle({ type: 'download-end', id: 'slow' });
-    expect(fakeFs.files.get(`${FOLDER}/slow/a.bin`)).toBe('AAAABBBBCCCC');
+    expect(fakeFs.files.get(`${DOCS}/a.bin`)).toBe('AAAABBBBCCCC');
   });
 
-  it('adds an extension from the file type and does not pass an empty type to the share sheet', async () => {
-    const { receiver } = setup();
-    await receiver.handle({ type: 'download-start', id: 'x1', name: 'photo', mime: 'image/jpeg' });
-    await receiver.handle({ type: 'download-end', id: 'x1' });
-    expect(sharingModule.shareAsync).toHaveBeenCalledWith(`${FOLDER}/x1/photo.jpg`, expect.objectContaining({ mimeType: 'image/jpeg' }));
-
-    await receiver.handle({ type: 'download-start', id: 'x2', name: 'mystery', mime: '' });
-    await receiver.handle({ type: 'download-end', id: 'x2' });
-    expect(sharingModule.shareAsync).toHaveBeenLastCalledWith(`${FOLDER}/x2/mystery`, expect.objectContaining({ mimeType: undefined }));
-  });
-
-  it('never saves outside its own folder, whatever the page calls the file', async () => {
+  it('never saves outside its own folders, whatever the page calls the file', async () => {
     const { receiver } = setup();
     await receiver.handle({ type: 'download-start', id: 'evil', name: '../../../etc/cron.d/evil.sh', mime: '' });
-    const saved = [...fakeFs.files.keys()];
-    expect(saved).toHaveLength(1);
-    expect(saved[0].startsWith(`${FOLDER}/evil/`)).toBe(true);
+    const cached = [...fakeFs.files.keys()];
+    expect(cached).toHaveLength(1);
+    expect(cached[0].startsWith(`${CACHE}/evil/`)).toBe(true);
     // The name is one plain file name: no slashes, so it can't climb out of the folder.
-    expect(saved[0].slice(`${FOLDER}/evil/`.length)).not.toMatch(/[\\/]/);
+    expect(cached[0].slice(`${CACHE}/evil/`.length)).not.toMatch(/[\\/]/);
+    await receiver.handle({ type: 'download-end', id: 'evil' });
+    const saved = fakeFs.copies[0].to;
+    expect(saved.startsWith(`${DOCS}/`)).toBe(true);
+    expect(saved.slice(`${DOCS}/`.length)).not.toMatch(/[\\/]/);
   });
 
   it('saves an empty file', async () => {
     const { receiver, events } = setup();
-    await receiver.handle({ type: 'download-start', id: 'e', name: 'empty.txt', mime: 'text/plain' });
-    await receiver.handle({ type: 'download-end', id: 'e' });
-    expect(fakeFs.files.get(`${FOLDER}/e/empty.txt`)).toBe('');
+    await sendFile(receiver, 'e', 'empty.txt', 'text/plain', []);
+    expect(fakeFs.files.get(`${DOCS}/empty.txt`)).toBe('');
     expect(events.onDone).toHaveBeenCalled();
   });
 
@@ -84,21 +166,22 @@ describe('DownloadReceiver', () => {
     await receiver.handle({ type: 'download-chunk', id: 'two', data: 'MjIy' });
     await receiver.handle({ type: 'download-end', id: 'two' });
     await receiver.handle({ type: 'download-end', id: 'one' });
-    expect(fakeFs.files.get(`${FOLDER}/one/one.txt`)).toBe('MTEx');
-    expect(fakeFs.files.get(`${FOLDER}/two/two.txt`)).toBe('MjIy');
-    expect(sharingModule.shareAsync).toHaveBeenCalledTimes(2);
+    expect(fakeFs.files.get(`${DOCS}/one.txt`)).toBe('MTEx');
+    expect(fakeFs.files.get(`${DOCS}/two.txt`)).toBe('MjIy');
   });
 
   it('ignores chunks and endings for a download it never started', async () => {
-    const { receiver, events } = setup();
+    const { receiver, events, store } = setup();
     await receiver.handle({ type: 'download-chunk', id: 'ghost', data: 'QUJD' });
     await receiver.handle({ type: 'download-end', id: 'ghost' });
     expect(fakeFs.files.size).toBe(0);
-    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+    expect(store.savedFolder).not.toHaveBeenCalled();
     expect(events.onDone).not.toHaveBeenCalled();
     expect(events.onFailed).not.toHaveBeenCalled();
   });
+});
 
+describe('failures', () => {
   it('reports an error from the page and removes the half-saved file', async () => {
     const { receiver, events } = setup();
     await receiver.handle({ type: 'download-start', id: 'bad', name: 'a.pdf', mime: '' });
@@ -107,7 +190,8 @@ describe('DownloadReceiver', () => {
     expect(events.onFailed).toHaveBeenCalledWith('The file could not be read.');
     expect(fakeFs.files.size).toBe(0);
     await receiver.handle({ type: 'download-end', id: 'bad' });
-    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+    expect(fakeFs.copies).toEqual([]);
+    expect(events.onDone).not.toHaveBeenCalled();
   });
 
   it('gives a default message when the page sends an error without one', async () => {
@@ -124,20 +208,18 @@ describe('DownloadReceiver', () => {
     expect(events.onStart).not.toHaveBeenCalled();
   });
 
-  it('reports a failure to open the share sheet', async () => {
+  it('reports a failure to open the share sheet, when there was no folder to save in', async () => {
     sharingModule.shareAsync.mockRejectedValueOnce(new Error('No app can handle this'));
-    const { receiver, events } = setup();
-    await receiver.handle({ type: 'download-start', id: 's', name: 'a.pdf', mime: '' });
-    await receiver.handle({ type: 'download-end', id: 's' });
+    const { receiver, events } = setup(folderStore(null, null));
+    await sendFile(receiver, 's', 'a.pdf', '');
     expect(events.onFailed).toHaveBeenCalledWith('No app can handle this');
     expect(events.onDone).not.toHaveBeenCalled();
   });
 
-  it('reports a device that cannot share', async () => {
+  it('reports a device that cannot share, when there was no folder to save in', async () => {
     sharingModule.isAvailableAsync.mockResolvedValueOnce(false);
-    const { receiver, events } = setup();
-    await receiver.handle({ type: 'download-start', id: 'n', name: 'a.pdf', mime: '' });
-    await receiver.handle({ type: 'download-end', id: 'n' });
+    const { receiver, events } = setup(folderStore(null, null));
+    await sendFile(receiver, 'n', 'a.pdf', '');
     expect(events.onFailed).toHaveBeenCalledWith('Sharing is not available on this device.');
     expect(sharingModule.shareAsync).not.toHaveBeenCalled();
   });
@@ -145,9 +227,9 @@ describe('DownloadReceiver', () => {
 
 describe('clearOldDownloads', () => {
   it('removes files left by earlier downloads', () => {
-    fakeFs.folders.add(FOLDER);
-    fakeFs.folders.add(`${FOLDER}/old`);
-    fakeFs.files.set(`${FOLDER}/old/a.pdf`, 'QUJD');
+    fakeFs.folders.add(CACHE);
+    fakeFs.folders.add(`${CACHE}/old`);
+    fakeFs.files.set(`${CACHE}/old/a.pdf`, 'QUJD');
     clearOldDownloads();
     expect(fakeFs.folders.size).toBe(0);
     expect(fakeFs.files.size).toBe(0);
@@ -155,7 +237,7 @@ describe('clearOldDownloads', () => {
 
   it('does nothing when there is nothing to remove, and never throws', () => {
     expect(() => clearOldDownloads()).not.toThrow();
-    fakeFs.folders.add(FOLDER);
+    fakeFs.folders.add(CACHE);
     fakeFs.failDeleteFolder = true;
     expect(() => clearOldDownloads()).not.toThrow();
   });

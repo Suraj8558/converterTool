@@ -26,6 +26,10 @@ const send = (message: unknown) => act(async () => props().onMessage({ nativeEve
 
 let backHandlers: (() => boolean)[];
 
+type AlertButton = { text: string; onPress?: () => void };
+/** What the user taps on the "Where should files be saved?" message. */
+let folderAnswer: 'Choose folder' | 'Share instead';
+
 beforeEach(() => {
   site.url = SITE;
   site.origin = SITE;
@@ -39,7 +43,11 @@ beforeEach(() => {
     return { remove: jest.fn() };
   });
   jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
-  jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+  folderAnswer = 'Choose folder';
+  fakeFs.pick = 'content://tree/Documents';
+  jest.spyOn(Alert, 'alert').mockImplementation(((title: string, _message?: string, buttons?: AlertButton[]) => {
+    if (title === 'Where should files be saved?') buttons?.find((button) => button.text === folderAnswer)?.onPress?.();
+  }) as never);
 });
 
 afterEach(() => jest.restoreAllMocks());
@@ -146,20 +154,101 @@ describe('back button', () => {
   });
 });
 
+const errorAlerts = () => (Alert.alert as jest.Mock).mock.calls.filter(([title]) => title !== 'Where should files be saved?');
+
 describe('saving files', () => {
-  it('shows what it is preparing and opens the share sheet when the file is ready', async () => {
+  it('asks where to save the first time, saves the file there, and says so', async () => {
     await render(<App />);
     await send({ type: 'download-start', id: 'abc', name: 'merged.pdf', mime: 'application/pdf' });
     expect(screen.getByText('Preparing merged.pdf…')).toBeOnTheScreen();
 
     await send({ type: 'download-chunk', id: 'abc', data: 'QUJD' });
     await send({ type: 'download-end', id: 'abc' });
+
+    expect(Alert.alert).toHaveBeenCalledWith('Where should files be saved?', expect.any(String), expect.any(Array), expect.anything());
+    expect(fakeFs.files.get('content://tree/Documents/merged.pdf')).toBe('QUJD');
+    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+    expect(screen.getByText('Saved merged.pdf to Documents')).toBeOnTheScreen();
+    expect(screen.queryByText(/Preparing/)).toBeNull();
+    expect(errorAlerts()).toEqual([]);
+  });
+
+  it('does not ask again for the next file', async () => {
+    await render(<App />);
+    for (const id of ['one', 'two']) {
+      await send({ type: 'download-start', id, name: `${id}.pdf`, mime: 'application/pdf' });
+      await send({ type: 'download-end', id });
+    }
+    const questions = (Alert.alert as jest.Mock).mock.calls.filter(([title]) => title === 'Where should files be saved?');
+    expect(questions).toHaveLength(1);
+    expect(fakeFs.files.has('content://tree/Documents/one.pdf')).toBe(true);
+    expect(fakeFs.files.has('content://tree/Documents/two.pdf')).toBe(true);
+    expect(screen.getByText('Saved two.pdf to Documents')).toBeOnTheScreen();
+  });
+
+  it('lets the user share the saved file from the notice', async () => {
+    await render(<App />);
+    await send({ type: 'download-start', id: 'abc', name: 'merged.pdf', mime: 'application/pdf' });
+    await send({ type: 'download-end', id: 'abc' });
+    expect(sharingModule.shareAsync).not.toHaveBeenCalled();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Share' }));
     expect(sharingModule.shareAsync).toHaveBeenCalledWith(
       'file:///cache/downloads/abc/merged.pdf',
       expect.objectContaining({ mimeType: 'application/pdf' })
     );
+  });
+
+  it('lets the user choose a different folder from the notice', async () => {
+    await render(<App />);
+    await send({ type: 'download-start', id: 'abc', name: 'merged.pdf', mime: 'application/pdf' });
+    await send({ type: 'download-end', id: 'abc' });
+
+    fakeFs.pick = 'content://tree/Converter%20Tool';
+    await fireEvent.press(screen.getByRole('button', { name: 'Change folder' }));
+    expect(screen.getByText('Files will now be saved to Converter Tool')).toBeOnTheScreen();
+
+    await send({ type: 'download-start', id: 'next', name: 'next.pdf', mime: 'application/pdf' });
+    await send({ type: 'download-end', id: 'next' });
+    expect(fakeFs.files.has('content://tree/Converter%20Tool/next.pdf')).toBe(true);
+    expect(screen.getByText('Saved next.pdf to Converter Tool')).toBeOnTheScreen();
+  });
+
+  it('opens the share sheet instead when the user would rather share', async () => {
+    folderAnswer = 'Share instead';
+    await render(<App />);
+    await send({ type: 'download-start', id: 'abc', name: 'merged.pdf', mime: 'application/pdf' });
+    await send({ type: 'download-end', id: 'abc' });
+
+    expect(sharingModule.shareAsync).toHaveBeenCalledWith(
+      'file:///cache/downloads/abc/merged.pdf',
+      expect.objectContaining({ mimeType: 'application/pdf' })
+    );
+    expect(fakeFs.copies).toEqual([]);
+    expect(screen.queryByText(/Saved merged/)).toBeNull();
     expect(screen.queryByText(/Preparing/)).toBeNull();
-    expect(Alert.alert).not.toHaveBeenCalled();
+  });
+
+  it('takes the notice away by itself after ten seconds', async () => {
+    // Capture the notice's timer instead of using fake timers, which upset the test library's cleanup.
+    let dismiss: (() => void) | undefined;
+    const realSetTimeout = globalThis.setTimeout;
+    jest.spyOn(globalThis, 'setTimeout').mockImplementation(((handler: () => void, delay?: number, ...args: unknown[]) => {
+      if (delay === 10_000) {
+        dismiss = handler;
+        return 0;
+      }
+      return realSetTimeout(handler, delay, ...args);
+    }) as never);
+
+    await render(<App />);
+    await send({ type: 'download-start', id: 'abc', name: 'merged.pdf', mime: 'application/pdf' });
+    await send({ type: 'download-end', id: 'abc' });
+    expect(screen.getByText('Saved merged.pdf to Documents')).toBeOnTheScreen();
+    expect(dismiss).toBeDefined();
+
+    await act(async () => dismiss!());
+    expect(screen.queryByText(/Saved merged/)).toBeNull();
   });
 
   it('tells the user when a file cannot be saved', async () => {
@@ -170,7 +259,8 @@ describe('saving files', () => {
     expect(screen.queryByText(/Preparing/)).toBeNull();
   });
 
-  it('tells the user when the share sheet fails', async () => {
+  it('tells the user when sharing fails', async () => {
+    folderAnswer = 'Share instead';
     sharingModule.shareAsync.mockRejectedValueOnce(new Error('No app can handle this'));
     await render(<App />);
     await send({ type: 'download-start', id: 's', name: 'a.pdf', mime: '' });

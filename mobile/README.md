@@ -7,8 +7,12 @@ phone and never uploaded.
 The app adds what a WebView does not do on its own:
 
 - **Saving files.** Android's WebView can't save the `blob:` links the tools make for their
-  results. The app catches them, passes the file to the app in small chunks and opens
-  Android's share sheet, where you can save it to Files or Drive, or send it to another app.
+  results. The app catches them and receives the file in small chunks. The first time, it asks
+  the user to choose a folder (Android doesn't let apps use the Downloads folder itself, so
+  they pick Documents or make one such as "Converter Tool"). Android remembers the choice, so
+  later downloads save there straight away, and a notice offers **Share** and **Change
+  folder**. If the user would rather not choose a folder, the file opens in Android's share
+  sheet instead, so it is never lost.
 - **Back button.** It goes back through the site's pages, and leaves the app from the first one.
 - **Links.** Pages of the site stay in the app. Other websites, `mailto:` and `tel:` links
   open in Android's own apps.
@@ -88,7 +92,8 @@ Before the first release, check:
 |---|---|
 | `App.tsx` | The screen: WebView, back button, offline screen, "preparing file" notice |
 | `src/injected.ts` | Script that runs in the page and sends saved files to the app in chunks |
-| `src/DownloadReceiver.ts` | Puts the chunks back together, saves the file and opens the share sheet |
+| `src/DownloadReceiver.ts` | Puts the chunks back together and saves the file in the user's folder, or shares it |
+| `src/saveFolder.ts` | Asks for and remembers the folder files are saved in |
 | `src/downloads.ts` | Checks messages from the page, and makes safe file names |
 | `src/navigation.ts` | Decides which links stay in the app |
 | `src/config.ts` | The website address |
@@ -105,14 +110,15 @@ Three kinds, none of which need a phone:
 - **App tests** (`npm test` in this folder) run `App.tsx` and `src/DownloadReceiver.ts` in
   Node with [Jest](https://jestjs.io) and React Native Testing Library. They check the setup
   message, which links stay in the app, the offline screen, the back button, and saving a
-  file from the first chunk to the share sheet, including errors, chunks in order, and
-  unsafe file names.
+  file from the first chunk to the chosen folder, including the first-time question, a folder
+  Android took back, falling back to the share sheet, errors, chunks in order, and unsafe file
+  names.
 
 `npm run typecheck` here checks the app's own code and tests.
 
 **What the app tests do not prove.** The WebView, the file system and the share sheet are
 replaced by fakes (`__tests__/support/`), so they check how the app *uses* those pieces, not
-how Android behaves. The app tests also don't run in CI, which installs only the website's
+how Android behaves (for example, that the folder picker really keeps its permission). The app tests also don't run in CI, which installs only the website's
 packages. Before releasing, install a build on a real phone and check that a tool's result
-can be saved, that the back button and links behave, and that the app works with the phone
+is saved in the chosen folder and shows up in the Files app, that the back button and links behave, and that the app works with the phone
 offline.

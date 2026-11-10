@@ -13,30 +13,59 @@ const join = (parts: Part[]) =>
 export const fakeFs = {
   /** File contents by address, as the base64 text appended to them. */
   files: new Map<string, string>(),
+  /** The file type each file was created with, by address. */
+  mimes: new Map<string, string>(),
   folders: new Set<string>(),
+  /** Every copy made, in order. */
+  copies: [] as { from: string; to: string }[],
   /** Pauses, in milliseconds, for the next writes in turn. Shows that writes stay in order. */
   writeDelays: [] as number[],
   failCreateFile: false,
   failDeleteFolder: false,
+  /** Folders Android has withdrawn access to: creating a file in them fails. */
+  deniedFolders: new Set<string>(),
+  /** What the system folder picker does next: a folder address, or 'cancel'. */
+  pick: 'cancel' as string,
+  picks: 0,
   reset() {
     this.files.clear();
+    this.mimes.clear();
     this.folders.clear();
+    this.copies = [];
     this.writeDelays = [];
     this.failCreateFile = false;
     this.failDeleteFolder = false;
+    this.deniedFolders.clear();
+    this.pick = 'cancel';
+    this.picks = 0;
   },
 };
 
-class FakeDirectory {
+export class FakeDirectory {
   uri: string;
   constructor(...parts: Part[]) {
     this.uri = join(parts);
+  }
+  static async pickDirectoryAsync() {
+    fakeFs.picks += 1;
+    if (fakeFs.pick === 'cancel') throw new Error('The user cancelled');
+    return new FakeDirectory(fakeFs.pick);
+  }
+  get name() {
+    return decodeURIComponent(this.uri.slice(this.uri.lastIndexOf('/') + 1));
   }
   get exists() {
     return fakeFs.folders.has(this.uri);
   }
   create() {
     fakeFs.folders.add(this.uri);
+  }
+  createFile(name: string, mimeType: string | null) {
+    if (fakeFs.deniedFolders.has(this.uri)) throw new Error('Permission denied');
+    const file = new FakeFile(this, name);
+    fakeFs.files.set(file.uri, '');
+    fakeFs.mimes.set(file.uri, mimeType ?? '');
+    return file;
   }
   delete() {
     if (fakeFs.failDeleteFolder) throw new Error('cannot delete');
@@ -45,7 +74,7 @@ class FakeDirectory {
   }
 }
 
-class FakeFile {
+export class FakeFile {
   uri: string;
   constructor(...parts: Part[]) {
     this.uri = join(parts);
@@ -53,15 +82,30 @@ class FakeFile {
   get name() {
     return this.uri.slice(this.uri.lastIndexOf('/') + 1);
   }
+  get exists() {
+    return fakeFs.files.has(this.uri);
+  }
   create() {
     if (fakeFs.failCreateFile) throw new Error('disk full');
     fakeFs.files.set(this.uri, '');
   }
+  textSync() {
+    return fakeFs.files.get(this.uri) ?? '';
+  }
+  delete() {
+    fakeFs.files.delete(this.uri);
+  }
+  async copy(destination: FakeFile | FakeDirectory) {
+    const target = destination instanceof FakeFile ? destination : new FakeFile(destination, this.name);
+    fakeFs.copies.push({ from: this.uri, to: target.uri });
+    fakeFs.files.set(target.uri, fakeFs.files.get(this.uri) ?? '');
+  }
   async write(content: string, options?: { encoding?: string; append?: boolean }) {
     const delay = fakeFs.writeDelays.shift() ?? 0;
     if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
-    if (options?.encoding !== 'base64') throw new Error('The app must write base64');
-    const previous = options.append ? (fakeFs.files.get(this.uri) ?? '') : '';
+    // The app stores text with the default encoding, and file contents as base64.
+    if (options?.encoding && options.encoding !== 'base64') throw new Error('The app must write base64');
+    const previous = options?.append ? (fakeFs.files.get(this.uri) ?? '') : '';
     fakeFs.files.set(this.uri, previous + content);
   }
 }
@@ -69,7 +113,7 @@ class FakeFile {
 export const fileSystemModule = {
   Directory: FakeDirectory,
   File: FakeFile,
-  Paths: { cache: new FakeDirectory('file:///cache') },
+  Paths: { cache: new FakeDirectory('file:///cache'), document: new FakeDirectory('file:///document') },
 };
 
 export const sharingModule = {
