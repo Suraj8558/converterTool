@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,28 +13,60 @@ import {
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { toolCategories } from '@/lib/tools';
 
+function CategoryMenu({ category }: { category: (typeof toolCategories)[number] }) {
+  const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  const cancelClose = () => clearTimeout(closeTimer.current);
+  const hoverOpen = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    cancelClose();
+    setOpen(true);
+  };
+  const hoverClose = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(false), 150);
+  };
+
+  return (
+    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="data-[state=open]:bg-accent"
+          onPointerEnter={hoverOpen}
+          onPointerLeave={hoverClose}
+        >
+          {category.name}
+          <ChevronDown className="h-4 w-4 opacity-60" aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="start"
+        className="max-h-[70vh] w-64 overflow-y-auto p-2"
+        onPointerEnter={cancelClose}
+        onPointerLeave={hoverClose}
+      >
+        {category.tools.map((tool) => (
+          <DropdownMenuItem key={tool.href} asChild className="cursor-pointer gap-3 rounded-lg py-2">
+            <Link href={tool.href}>
+              <span className="text-primary [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">{tool.icon}</span>
+              {tool.name}
+            </Link>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export function DesktopToolNav() {
   return (
     <nav aria-label="Tools" className="hidden lg:flex items-center gap-1">
       {toolCategories.map((category) => (
-        <DropdownMenu key={category.name}>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="data-[state=open]:bg-accent">
-              {category.name}
-              <ChevronDown className="h-4 w-4 opacity-60" aria-hidden="true" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="max-h-[70vh] w-64 overflow-y-auto p-2">
-            {category.tools.map((tool) => (
-              <DropdownMenuItem key={tool.href} asChild className="cursor-pointer gap-3 rounded-lg py-2">
-                <Link href={tool.href}>
-                  <span className="text-primary [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">{tool.icon}</span>
-                  {tool.name}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <CategoryMenu key={category.name} category={category} />
       ))}
     </nav>
   );
