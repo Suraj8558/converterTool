@@ -37,6 +37,10 @@ function CategoryMenu({ category }: { category: (typeof toolCategories)[number] 
           size="sm"
           className="data-[state=open]:bg-accent"
           onPointerEnter={hoverOpen}
+          onPointerDown={(e) => {
+            // A mouse click on an already-open (hover-opened) menu keeps it open instead of toggling it shut.
+            if (e.pointerType === 'mouse' && open) e.preventDefault();
+          }}
           onPointerLeave={hoverClose}
         >
           {category.name}
