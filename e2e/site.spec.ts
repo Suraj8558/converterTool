@@ -176,3 +176,18 @@ test('files stay in the browser: converting uploads nothing', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Conversion Complete!' })).toBeVisible();
   expect(uploads).toEqual([]);
 });
+
+test.describe('header menus on hover', () => {
+  test('open on hover and close when the pointer leaves', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+    const trigger = page.locator('header').getByRole('button', { name: 'PDF & Document Tools' });
+    await trigger.hover();
+    const item = page.getByRole('menuitem', { name: 'PDF Merge' });
+    await expect(item).toBeVisible();
+    await item.hover();
+    await expect(item).toBeVisible();
+    await page.mouse.move(600, 600);
+    await expect(item).toBeHidden();
+  });
+});
